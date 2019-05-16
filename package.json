@@ -4,21 +4,60 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "parcel src/index.html",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "parcel src/index.html",
+    "lint": "xo",
+    "lint:fix": "xo --fix",
+    "test": "xo && jest"
   },
   "author": "",
   "license": "ISC",
+  "xo": {
+    "globals": [
+      "$",
+      "window",
+      "document"
+    ],
+    "rules": {
+      "import/no-unresolved": false
+    },
+    "settings": {
+      "import/resolver": {
+        "parcel": {
+          "rootDir": "src",
+          "extensions": [
+            ".ts"
+          ]
+        }
+      }
+    },
+    "extends": "xo-typescript",
+    "extensions": [
+      "ts"
+    ],
+    "ignore": [
+      "src/patterns/templates",
+      "fractal.js"
+    ]
+  },
   "dependencies": {
-    "frets": "^0.6.0",
-    "parcel": "^1.12.3"
+    "frets": "^0.6.0"
   },
   "devDependencies": {
     "@types/sass": "^1.16.0",
+    "@types/stylelint": "^9.10.0",
     "@types/typescript": "^2.0.0",
+    "eslint-config-xo": "^0.26.0",
+    "eslint-config-xo-typescript": "^0.12.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-import-resolver-parcel": "^1.9.0",
+    "eslint-plugin-import": "^2.17.2",
     "frets-styles-generator": "^1.2.0",
+    "parcel": "^1.12.3",
     "sass": "^1.20.1",
+    "stylelint": "10.0.1",
+    "stylelint-config-recommended": "^2.2.0",
     "tailwindcss": "^1.0.1",
-    "typescript": "^3.4.5"
+    "typescript": "^3.4.5",
+    "xo": "^0.24.0"
   }
 }
