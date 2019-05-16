@@ -1,6 +1,7 @@
 .DS_Store
 node_modules
 build/**
+dist/**
 styleguide/**
 styleguide-static/**
 !styleguide/web.config
