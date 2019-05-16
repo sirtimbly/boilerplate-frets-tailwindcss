@@ -8,3 +8,15 @@ body {
   background-color: lightgray;
   font-family: 'Helvetica', Arial, sans-serif;
 }
+
+.btn {
+  @apply font-bold py-2 px-3 rounded cursor-pointer text-center;
+}
+
+.btn-blue {
+  @apply bg-blue-500 text-white;
+}
+
+.btn-blue:hover {
+  @apply bg-blue-700;
+}

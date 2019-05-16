@@ -1057,6 +1057,8 @@ get z_30() { return this.add("z-30"); }
 get z_40() { return this.add("z-40"); }
 get z_50() { return this.add("z-50"); }
 get zAuto() { return this.add("z-auto"); }
+get btn() { return this.add("btn"); }
+get btnBlue() { return this.add("btn-blue"); }
 
 }
 

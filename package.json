@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "parcel src/index.html",
+    "dev": "unite \"parcel serve src/index.html\" \"frets-styles-generator -w src/styles/\"",
     "lint": "xo",
     "lint:fix": "xo --fix",
     "test": "xo && jest"
@@ -43,9 +43,13 @@
     "frets": "^0.6.0"
   },
   "devDependencies": {
+    "@gunar/unite": "1.2.3",
+    "@types/eslint": "^4.16.6",
     "@types/sass": "^1.16.0",
     "@types/stylelint": "^9.10.0",
     "@types/typescript": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "eslint": "5.16.0",
     "eslint-config-xo": "^0.26.0",
     "eslint-config-xo-typescript": "^0.12.0",
     "eslint-import-resolver-alias": "^1.1.2",
