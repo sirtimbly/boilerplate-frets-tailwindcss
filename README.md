@@ -26,6 +26,7 @@ const helloNode = $.div.p_2.mxAuto.textCenter.h('hello')
 
 TODO:
 
-[] parcel in build mode
+[] parcel in production build mode
 [] css-purge
 [] cssnano
+[] testing

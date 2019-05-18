@@ -36,7 +36,8 @@
     ],
     "ignore": [
       "src/patterns/templates",
-      "fractal.js"
+      "fractal.js",
+      "postcss.config.js"
     ]
   },
   "dependencies": {

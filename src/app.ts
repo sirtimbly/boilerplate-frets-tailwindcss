@@ -4,10 +4,6 @@ import {renderRoot} from './views/root';
 export class RealWorldProps extends PropsWithFields {
 	public username?: string;
 
-	public visibleArticle?: [];
-
-	public activeArticleId?: string;
-
 	constructor(props?: Partial<RealWorldProps>) {
 		super();
 		if (props) {
@@ -23,21 +19,23 @@ export class RealWorldActions extends ActionsWithFields {
 
 	public openArticle: (e: Event) => void;
 }
+export type App = FRETS<RealWorldProps, RealWorldActions>;
+export type ActionFn = (e: Event, data: Readonly<RealWorldProps>) => RealWorldProps;
 
-export const F = new FRETS<RealWorldProps, RealWorldActions>(
+const F: App = new FRETS<RealWorldProps, RealWorldActions>(
 	new RealWorldProps(),
 	new RealWorldActions()
 );
 
-export type TApp = FRETS<RealWorldProps, RealWorldActions>;
-
-F.actions.login = F.registerAction((e: Event, data: Readonly<RealWorldProps>): RealWorldProps => {
+const loginAction: ActionFn = (e, data) => {
 	e.preventDefault();
 	return {
 		...data,
 		username: F.getField<string>('fieldName').value
 	};
-});
+};
+
+F.actions.login = F.registerAction(loginAction);
 
 F.registerView(renderRoot);
 

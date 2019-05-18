@@ -1,10 +1,10 @@
 import {VNode} from 'frets';
-import {TApp} from '../app';
+import {App} from '../app';
 import {$, $$} from '../styles/app-styles';
 
 export const notification = $.div.maxWMd.mxAuto.flex.justifyBetween.itemsCenter.p_6.bgWhite.rounded.shadowXl.m_3;
 export const input = $.input.bgGray_100.m_2.p_1.textBlack.rounded;
-export const renderRoot = (app: TApp): VNode => {
+export const renderRoot = (app: App): VNode => {
 	const usernameField = app.registerField<string>('fieldName');
 	const passField = app.registerField<string>('fieldPass');
 	return notification.h([
