@@ -1,42 +1,34 @@
-import {PropsWithFields, ActionsWithFields, FRETS} from 'frets';
+import {IFunFrets, setup} from 'frets/src/Frets';
+
+import {PropsWithFields} from 'frets';
 import {renderRoot} from './views/root';
 
 export class RealWorldProps extends PropsWithFields {
-	public username?: string;
+	username: string = '';
 
-	constructor(props?: Partial<RealWorldProps>) {
-		super();
-		if (props) {
-			Object.assign(this, props);
+	logout: boolean;
+}
+
+export type ActionFn = (e: Event, data?: Readonly<RealWorldProps>) => Partial<RealWorldProps> | undefined;
+
+export type App = IFunFrets<RealWorldProps>;
+
+setup<RealWorldProps>(new RealWorldProps(), (F: App) => {
+	F.registerModel((proposal: Partial<RealWorldProps>, state) => {
+		if (proposal.username !== undefined && proposal.username.length > 3) {
+			F.modelProps.username = proposal.username;
 		}
-	}
-}
 
-export class RealWorldActions extends ActionsWithFields {
-	public login: (e: Event) => void;
+		if (proposal.logout === true) {
+			F.modelProps.username = '';
+		}
 
-	public loadArticles: (e: Event) => void;
+		if (proposal.registeredFieldValidationErrors) {
+			F.modelProps.registeredFieldValidationErrors = proposal.registeredFieldValidationErrors;
+		}
 
-	public openArticle: (e: Event) => void;
-}
-export type App = FRETS<RealWorldProps, RealWorldActions>;
-export type ActionFn = (e: Event, data: Readonly<RealWorldProps>) => RealWorldProps;
+		state(F.modelProps);
+	});
 
-const F: App = new FRETS<RealWorldProps, RealWorldActions>(
-	new RealWorldProps(),
-	new RealWorldActions()
-);
-
-const loginAction: ActionFn = (e, data) => {
-	e.preventDefault();
-	return {
-		...data,
-		username: F.getField<string>('fieldName').value
-	};
-};
-
-F.actions.login = F.registerAction(loginAction);
-
-F.registerView(renderRoot);
-
-F.mountTo('app');
+	F.registerView(renderRoot);
+}).mountTo('app');
