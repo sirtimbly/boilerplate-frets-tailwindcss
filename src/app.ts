@@ -1,30 +1,41 @@
 import {IFunFrets, setup} from 'frets/src/Frets';
 
-import {PropsWithFields} from 'frets';
+import {PropsWithFields} from 'frets/src/PropsFieldRegistry';
 import {renderRoot} from './views/root';
 
 export class RealWorldProps extends PropsWithFields {
-	username: string = '';
+	accountId: string = '';
+
+	loading: boolean;
 
 	logout: boolean;
+
+	error: string;
 }
 
 export type ActionFn = (e: Event, data?: Readonly<RealWorldProps>) => Partial<RealWorldProps> | undefined;
 
 export type App = IFunFrets<RealWorldProps>;
 
-setup<RealWorldProps>(new RealWorldProps(), (F: App) => {
+setup(new RealWorldProps(), (F: App) => {
 	F.registerModel((proposal: Partial<RealWorldProps>, state) => {
-		if (proposal.username !== undefined && proposal.username.length > 3) {
-			F.modelProps.username = proposal.username;
+		if (proposal.accountId !== undefined) {
+			F.modelProps.error = '';
+			F.modelProps.loading = true;
+			setTimeout(() => {
+				F.modelProps.loading = false;
+				if (proposal.accountId === 'tim') {
+					F.modelProps.accountId = proposal.accountId;
+				} else {
+					F.modelProps.error = 'Invalid username or bad password.';
+				}
+
+				state(F.modelProps);
+			}, 1100);
 		}
 
 		if (proposal.logout === true) {
-			F.modelProps.username = '';
-		}
-
-		if (proposal.registeredFieldValidationErrors) {
-			F.modelProps.registeredFieldValidationErrors = proposal.registeredFieldValidationErrors;
+			F.modelProps.accountId = '';
 		}
 
 		state(F.modelProps);
