@@ -45,10 +45,14 @@ export const renderRoot = (app: App): VNode => {
 	});
 
 	return $.div.h([
-		$.div.maxWMd.mxAuto.flex.flexCol.justifyBetween.itemsCenter.p_6.bgWhite.rounded.shadowXl.my_3.h([
+		// <h1 class="font-bold text-2xl text-center mx-auto mt-3">A Simple FRETS Web App</h1>
+		$$('h1').fontBold.text_2xl.textCenter.mxAuto.mt_3.h([
+			'A Simple Frets Sample App'
+		]),
+		$.div.maxWMd.mxAuto.flex.flexCol.itemsCenter.p_6.bgWhite.rounded.shadowXl.my_3.h([
 			error(app.modelProps.error),
 			app.modelProps.accountId ?
-				$.div.flexGrow.flex.flexCol.justifyAround.itemsCenter.minWFull.p_2.h([
+				$.div.minWFull.p_2.h([
 					$.div.h([`Hello ${app.modelProps.accountId}`]),
 					$.button.btn.btnBlue.mx_2.h({onclick: logoutAction}, ['Logout']),
 					showList(app)
