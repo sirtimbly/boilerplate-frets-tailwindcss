@@ -3,6 +3,7 @@ import {App} from '../app';
 import {$, $$} from '../styles/app-styles';
 import {textInput} from '../components/input';
 import {error} from '~components/error';
+import {showList} from '~components/todolist';
 
 export const renderRoot = (app: App): VNode => {
 	const usernameField = app.registerField('Username', app.modelProps.accountId, {
@@ -47,11 +48,12 @@ export const renderRoot = (app: App): VNode => {
 		$.div.maxWMd.mxAuto.flex.flexCol.justifyBetween.itemsCenter.p_6.bgWhite.rounded.shadowXl.my_3.h([
 			error(app.modelProps.error),
 			app.modelProps.accountId ?
-				$.div.flexGrow.flex.flexRow.justifyBetween.itemsCenter.minWFull.p_2.h([
+				$.div.flexGrow.flex.flexCol.justifyAround.itemsCenter.minWFull.p_2.h([
 					$.div.h([`Hello ${app.modelProps.accountId}`]),
-					$.button.btn.btnBlue.mx_2.h({onclick: logoutAction}, ['Logout'])
+					$.button.btn.btnBlue.mx_2.h({onclick: logoutAction}, ['Logout']),
+					showList(app)
 				]) :
-				app.modelProps.loading ? $.div.textGray_700.textCenter.h(['Loading...']) :
+				app.modelProps.loading ? $.div.textGray_700.textCenter.h(['Logging In...']) :
 					$$('form').itemsCenter.flex.flexCol.minWFull.itemsStretch.h([
 						...(
 							[usernameField, passField].map(textInput)

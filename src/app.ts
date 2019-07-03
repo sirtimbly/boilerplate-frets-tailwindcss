@@ -11,6 +11,10 @@ export class RealWorldProps extends PropsWithFields {
 	logout: boolean;
 
 	error: string;
+
+	list: any;
+
+	showPlaceholder: boolean;
 }
 
 export type ActionFn = (e: Event, data?: Readonly<RealWorldProps>) => Partial<RealWorldProps> | undefined;
@@ -31,11 +35,25 @@ setup(new RealWorldProps(), (F: App) => {
 				}
 
 				state(F.modelProps);
-			}, 1100);
+			}, 300);
+		}
+
+		if (proposal.loading === true || proposal.loading === false) {
+			F.modelProps.loading = proposal.loading;
+		}
+
+		if (proposal.showPlaceholder === true || proposal.showPlaceholder === false) {
+			F.modelProps.showPlaceholder = proposal.showPlaceholder;
+		}
+
+		if (proposal.list) {
+			F.modelProps.list = proposal.list;
 		}
 
 		if (proposal.logout === true) {
 			F.modelProps.accountId = '';
+		} else {
+			proposal.logout = false;
 		}
 
 		state(F.modelProps);

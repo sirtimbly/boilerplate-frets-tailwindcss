@@ -41,7 +41,7 @@
     ]
   },
   "dependencies": {
-    "frets": "^0.6.0"
+    "frets": "^1.0.0-beta.1"
   },
   "devDependencies": {
     "@gunar/unite": "1.2.3",
