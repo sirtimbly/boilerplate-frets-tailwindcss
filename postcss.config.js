@@ -13,7 +13,7 @@ module.exports = {
 				extensions: ["ts"]
 			}],
 			whitelist: ['html', 'body', 'input', 'button', 'select'],
-			// whitelistPatterns: [/icon/, /green/, /fade/],
+			whitelistPatterns: [/w\-\d+.+\d/],
 			rejected: true
 		})
 	]
