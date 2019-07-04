@@ -11,9 +11,8 @@ export function showList(app: App): VNode {
 					propose({showPlaceholder: true});
 				}
 			}, 200);
-			// fetch('https://jsonplaceholder.typicode.com/todos')
-			fetch('https://slowwly.robertomurray.co.uk/delay/900/url/https://jsonplaceholder.typicode.com/todos')
-			// fetch('http://slowwly.robertomurray.co.uk/delay/2000/url/https://jsonplaceholder.typicode.com/todos')
+			// fetch('http://slowwly.robertomurray.co.uk/delay/900/url/https://jsonplaceholder.typicode.com/todos')
+			fetch('https://jsonplaceholder.typicode.com/todos')
 				.then(response => response.json())
 				.then(json => {
 					console.log('list', json);
@@ -38,8 +37,7 @@ export function showList(app: App): VNode {
 			$.div.bgGray_200.p_2.h(
 				(app.modelProps.list && app.modelProps.list.length > 0) ? Object.keys(app.modelProps.list).map((key: string | number) => {
 					const todo = app.modelProps.list[key];
-					console.log('list item', todo);
-					return $.div.borderB.borderGray_700.p_1.m_1.h({
+					return $.div.borderB.borderGray_400.p_1.m_1.h({
 						key: todo.id
 					}, [todo.title]);
 				}) : []
