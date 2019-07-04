@@ -1,4 +1,4 @@
-import {VNode} from 'frets/src';
+import {VNode} from 'frets';
 import {$} from '../styles/app-styles';
 
 export function error(val?: string): VNode | string {

@@ -1,5 +1,4 @@
-import {VNode} from 'frets/src/index';
-import {IRegisteredField} from 'frets/src/Frets';
+import {IRegisteredField, VNode} from 'frets';
 import {$, $$} from '../styles/app-styles';
 
 export function textInput(field: IRegisteredField<string>): VNode {

@@ -1,6 +1,5 @@
-import {IFunFrets, setup} from 'frets/src/Frets';
+import {IFunFrets, setup, PropsWithFields} from 'frets';
 
-import {PropsWithFields} from 'frets/src/PropsFieldRegistry';
 import {renderRoot} from './views/root';
 
 export class RealWorldProps extends PropsWithFields {

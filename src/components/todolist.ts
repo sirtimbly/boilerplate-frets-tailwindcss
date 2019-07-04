@@ -1,4 +1,4 @@
-import {VNode} from 'frets/src/index';
+import {VNode} from 'frets';
 import {App} from '../app';
 import {$, $$} from '~styles/app-styles';
 
