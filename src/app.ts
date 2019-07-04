@@ -1,42 +1,62 @@
-import {PropsWithFields, ActionsWithFields, FRETS} from 'frets';
+import {IFunFrets, setup, PropsWithFields} from 'frets';
+
 import {renderRoot} from './views/root';
 
 export class RealWorldProps extends PropsWithFields {
-	public username?: string;
+	accountId: string = '';
 
-	constructor(props?: Partial<RealWorldProps>) {
-		super();
-		if (props) {
-			Object.assign(this, props);
+	loading: boolean;
+
+	logout: boolean;
+
+	error: string;
+
+	list: any;
+
+	showPlaceholder: boolean;
+}
+
+export type ActionFn = (e: Event, data?: Readonly<RealWorldProps>) => Partial<RealWorldProps> | undefined;
+
+export type App = IFunFrets<RealWorldProps>;
+
+setup(new RealWorldProps(), (F: App) => {
+	F.registerModel((proposal: Partial<RealWorldProps>, state) => {
+		if (proposal.accountId !== undefined) {
+			F.modelProps.error = '';
+			F.modelProps.loading = true;
+			setTimeout(() => {
+				F.modelProps.loading = false;
+				if (proposal.accountId === 'tim') {
+					F.modelProps.accountId = proposal.accountId;
+				} else {
+					F.modelProps.error = 'Invalid username or bad password.';
+				}
+
+				state(F.modelProps);
+			}, 300);
 		}
-	}
-}
 
-export class RealWorldActions extends ActionsWithFields {
-	public login: (e: Event) => void;
+		if (proposal.loading === true || proposal.loading === false) {
+			F.modelProps.loading = proposal.loading;
+		}
 
-	public loadArticles: (e: Event) => void;
+		if (proposal.showPlaceholder === true || proposal.showPlaceholder === false) {
+			F.modelProps.showPlaceholder = proposal.showPlaceholder;
+		}
 
-	public openArticle: (e: Event) => void;
-}
-export type App = FRETS<RealWorldProps, RealWorldActions>;
-export type ActionFn = (e: Event, data: Readonly<RealWorldProps>) => RealWorldProps;
+		if (proposal.list) {
+			F.modelProps.list = proposal.list;
+		}
 
-const F: App = new FRETS<RealWorldProps, RealWorldActions>(
-	new RealWorldProps(),
-	new RealWorldActions()
-);
+		if (proposal.logout === true) {
+			F.modelProps.accountId = '';
+		} else {
+			proposal.logout = false;
+		}
 
-const loginAction: ActionFn = (e, data) => {
-	e.preventDefault();
-	return {
-		...data,
-		username: F.getField<string>('fieldName').value
-	};
-};
+		state(F.modelProps);
+	});
 
-F.actions.login = F.registerAction(loginAction);
-
-F.registerView(renderRoot);
-
-F.mountTo('app');
+	F.registerView(renderRoot);
+}).mountTo('app');

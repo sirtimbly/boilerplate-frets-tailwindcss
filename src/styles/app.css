@@ -20,3 +20,7 @@ body {
 .btn-blue:hover {
   @apply bg-blue-700;
 }
+
+.btn-blue:disabled {
+  @apply bg-gray-500 text-gray-200 .cursor-not-allowed;
+}
