@@ -12,7 +12,7 @@ export function showList(app: App): VNode {
 				}
 			}, 200);
 			// fetch('https://jsonplaceholder.typicode.com/todos')
-			fetch('http://slowwly.robertomurray.co.uk/delay/900/url/https://jsonplaceholder.typicode.com/todos')
+			fetch('https://slowwly.robertomurray.co.uk/delay/900/url/https://jsonplaceholder.typicode.com/todos')
 			// fetch('http://slowwly.robertomurray.co.uk/delay/2000/url/https://jsonplaceholder.typicode.com/todos')
 				.then(response => response.json())
 				.then(json => {
