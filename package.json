@@ -13,12 +13,17 @@
   },
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=10.x",
+    "yarn": "1.x"
+  },
   "xo": {
     "globals": [
       "$",
       "window",
       "document"
     ],
+    "prettier": true,
     "rules": {
       "import/no-unresolved": false
     },
@@ -43,30 +48,34 @@
     ]
   },
   "dependencies": {
-    "frets": "^1.0.0-beta.2"
+    "@types/lodash-es": "^4.17.3",
+    "frets": "^1.0.0-beta.2",
+    "lodash-es": "^4.17.15"
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^1.2.0",
     "@gunar/unite": "1.2.3",
-    "@types/eslint": "^4.16.6",
+    "@types/eslint": "^6.1.8",
     "@types/sass": "^1.16.0",
-    "@types/stylelint": "^9.10.0",
+    "@types/stylelint": "^9.10.1",
     "@types/typescript": "^2.0.0",
-    "@typescript-eslint/eslint-plugin": "^1.9.0",
-    "eslint": "5.16.0",
-    "eslint-config-xo": "^0.26.0",
+    "@typescript-eslint/parser": "2.19.0",
+    "@typescript-eslint/eslint-plugin": "^2.19.0",
+    "eslint": "6.8.0",
+    "eslint-config-xo": "^0.27.2",
     "eslint-config-xo-typescript": "^0.12.0",
     "eslint-import-resolver-alias": "^1.1.2",
-    "eslint-import-resolver-parcel": "^1.9.0",
-    "eslint-plugin-import": "^2.17.2",
-    "frets-styles-generator": "^1.2.0",
-    "parcel": "^1.12.3",
+    "eslint-import-resolver-parcel": "^1.10.3",
+    "eslint-plugin-import": "^2.20.1",
+    "frets-styles-generator": "^1.4.0",
+    "parcel": "^1.12.4",
+    "prettier": "1.19.1",
     "purgecss-from-frets": "^1.0.3",
     "sass": "^1.20.1",
     "stylelint": "10.0.1",
     "stylelint-config-recommended": "^2.2.0",
-    "tailwindcss": "^1.0.1",
-    "typescript": "^3.4.5",
-    "xo": "^0.24.0"
+    "tailwindcss": "^1.2.0",
+    "typescript": "^3.7.5",
+    "xo": "^0.25.3"
   }
 }

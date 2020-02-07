@@ -1,102 +1,151 @@
 
-  import {maquette as Maquette} from "frets";
+  import { maquette as Maquette } from "frets";
 
-    export default class BaseStyles {
-        public chain: string[];
-        public conditions: boolean[] = [];
-        public classProps: any = {};
-        private writeConditionIndex: number = 0;
-        private readConditionIndex: number = 0;
-        private classObjectMode: boolean = false;
+  export default class BaseStyles {
+    public chain: string[];
+    public conditions: boolean[] = [];
+    public classProps: any = {};
+    private writeConditionIndex: number = 0;
+    private readConditionIndex: number = 0;
+    private classObjectMode: boolean = false;
 
-        constructor(selector: string) {
-            this.chain = new Array<string>();
-            if (selector.length > 0) {
-                this.chain.push(selector);
-            }
-            return this;
-        }
+    constructor(selector: string) {
+      this.chain = new Array<string>();
+      if (selector.length > 0) {
+        this.chain.push(selector);
+      }
+      return this;
+    }
 
-        public when = (condition: boolean): BaseStyles => {
-            this.classObjectMode = true;
-            this.conditions[this.writeConditionIndex] = condition;
-            return this;
-        }
+    public when = (condition: boolean): BaseStyles => {
+      this.classObjectMode = true;
+      this.conditions[this.writeConditionIndex] = condition;
+      return this;
+    };
 
-        public andWhen = (condition: boolean): BaseStyles => {
-            this.classObjectMode = true;
-            this.writeConditionIndex++;
-            this.readConditionIndex++;
-            return this.when(condition);
+    public andWhen = (condition: boolean): BaseStyles => {
+      this.classObjectMode = true;
+      this.writeConditionIndex++;
+      this.readConditionIndex++;
+      return this.when(condition);
+    };
 
-        }
+    public otherwise = (): BaseStyles => {
+      this.classObjectMode = true;
+      return this.andWhen(!this.conditions[this.readConditionIndex]);
+    };
 
-        public otherwise = (): BaseStyles => {
-            this.classObjectMode = true;
-            return this.andWhen( !this.conditions[this.readConditionIndex]);
-        }
+    public h = (
+      ...children: Array<(Maquette.VNodeProperties | string | Maquette.VNode | Maquette.VNodeChild)>
+    ): Maquette.VNode => {
+      if (this.classObjectMode) {
+        throw Error(
+          "You can't build a vnode when you are using this for building a classes object"
+        );
+      }
+      if (children[0]
+          && typeof children[0] === "object"
+          && !Array.isArray(children[0])
+          && !(children[0] as Maquette.VNode).vnodeSelector) {
+              return Maquette.h(this.toString()
+              , children[0] as Maquette.VNodeProperties
+              , children.slice(1) as Array<(string | Maquette.VNode | Maquette.VNodeChild)>);
+          }
+      return Maquette.h(this.toString(), {}, children as Array<(string | Maquette.VNode | Maquette.VNodeChild)>);
+    }
 
-        public h = (properties?: Maquette.VNodeProperties, children?: (string | Maquette.VNode | Maquette.VNodeChild)[]): Maquette.VNode => {
-            if (this.classObjectMode) {
-                throw Error("You can't build a vnode when you are using this for building a classes object");
-            }
-            if (properties && typeof properties === "object" && properties.length > 0) {
-                return Maquette.h(this.toString(), properties);
-            }
-            return Maquette.h(this.toString(), properties, children);
-        }
+    public toObj = () => {
+      if (!this.classObjectMode) {
+        // tslint:disable-next-line:max-line-length
+        throw Error(
+          "You need to call at least one conditional method in order to use this as a classes object generator"
+        );
+      }
+      return this.classProps;
+    };
 
-        public toObj = () => {
-            if (!this.classObjectMode) {
-                // tslint:disable-next-line:max-line-length
-                throw Error("You need to call at least one conditional method in order to use this as a classes object generator");
-            }
-            return this.classProps;
-        }
+    get div(): BaseStyles {
+      return new BaseStyles("div");
+    }
+    get img(): BaseStyles {
+      return new BaseStyles("img");
+    }
+    get a(): BaseStyles {
+      return new BaseStyles("a");
+    }
+    get p(): BaseStyles {
+      return new BaseStyles("p");
+    }
+    get ul(): BaseStyles {
+      return new BaseStyles("ul");
+    }
+    get ol(): BaseStyles {
+      return new BaseStyles("ol");
+    }
+    get li(): BaseStyles {
+      return new BaseStyles("li");
+    }
+    get section(): BaseStyles {
+      return new BaseStyles("section");
+    }
+    get header(): BaseStyles {
+      return new BaseStyles("header");
+    }
+    get article(): BaseStyles {
+      return new BaseStyles("article");
+    }
+    get nav(): BaseStyles {
+      return new BaseStyles("nav");
+    }
+    get aside(): BaseStyles {
+      return new BaseStyles("aside");
+    }
+    get span(): BaseStyles {
+      return new BaseStyles("span");
+    }
+    get button(): BaseStyles {
+      return new BaseStyles("button");
+    }
+    get input(): BaseStyles {
+      return new BaseStyles("input");
+    }
+    get label(): BaseStyles {
+      return new BaseStyles("label");
+    }
+    get select(): BaseStyles {
+      return new BaseStyles("select");
+    }
+    get textarea(): BaseStyles {
+      return new BaseStyles("textarea");
+    }
 
-        get div(): BaseStyles { return new BaseStyles("div"); }
-        get img(): BaseStyles { return new BaseStyles("img"); }
-        get a(): BaseStyles { return new BaseStyles("a"); }
-        get p(): BaseStyles { return new BaseStyles("p"); }
-        get ul(): BaseStyles { return new BaseStyles("ul"); }
-        get ol(): BaseStyles { return new BaseStyles("ol"); }
-        get li(): BaseStyles { return new BaseStyles("li"); }
-        get section(): BaseStyles { return new BaseStyles("section"); }
-        get header(): BaseStyles { return new BaseStyles("header"); }
-        get article(): BaseStyles { return new BaseStyles("article"); }
-        get nav(): BaseStyles { return new BaseStyles("nav"); }
-        get aside(): BaseStyles { return new BaseStyles("aside"); }
-        get span(): BaseStyles { return new BaseStyles("span"); }
-        get button(): BaseStyles { return new BaseStyles("button"); }
-        get input(): BaseStyles { return new BaseStyles("input"); }
-        get label(): BaseStyles { return new BaseStyles("label"); }
-        get select(): BaseStyles { return new BaseStyles("select"); }
-        get textarea(): BaseStyles { return new BaseStyles("textarea"); }
+    public toString = (): string => {
+      if (this.classObjectMode) {
+        throw Error(
+          "You can't build a selector string when you are calling conditional methods"
+        );
+      }
+      if (this.chain.length === 1) {
+        return this.chain[0] || "div";
+      }
+      return this.chain.join(".");
+    };
 
-        public toString = (): string => {
-            if (this.classObjectMode) {
-                throw Error("You can't build a selector string when you are calling conditional methods");
-            }
-            if (this.chain.length === 1) {
-                return this.chain[0] || "div";
-            }
-            return this.chain.join(".");
-        }
+    public $ = (className: string): BaseStyles => {
+      return this.add(className);
+    };
 
-        public $ = (className: string): BaseStyles => {
-            return this.add(className);
-        }
-
-        public add = (className: string): BaseStyles => {
-            if (this.classObjectMode) {
-                this.classProps[className] = this.conditions[this.readConditionIndex];
-            } else if (className.length > 0) {
-                this.chain.push(className);
-            }
-            return this;
-        }
-
-        get container() { return this.add("container"); }
+    public add = (className: string): BaseStyles => {
+      if (this.classObjectMode) {
+        this.classProps[className] = this.conditions[this.readConditionIndex];
+      } else if (className.length > 0) {
+        this.chain.push(className);
+      }
+      return this;
+    };
+    get container() { return this.add("container"); }
+get srOnly() { return this.add("sr-only"); }
+get notSrOnly() { return this.add("not-sr-only"); }
 get appearanceNone() { return this.add("appearance-none"); }
 get bgFixed() { return this.add("bg-fixed"); }
 get bgLocal() { return this.add("bg-local"); }
@@ -194,6 +243,99 @@ get bgPink_600() { return this.add("bg-pink-600"); }
 get bgPink_700() { return this.add("bg-pink-700"); }
 get bgPink_800() { return this.add("bg-pink-800"); }
 get bgPink_900() { return this.add("bg-pink-900"); }
+get hoverBgTransparent() { return this.add("hover\:bg-transparent"); }
+get hoverBgBlack() { return this.add("hover\:bg-black"); }
+get hoverBgWhite() { return this.add("hover\:bg-white"); }
+get hoverBgGray_100() { return this.add("hover\:bg-gray-100"); }
+get hoverBgGray_200() { return this.add("hover\:bg-gray-200"); }
+get hoverBgGray_300() { return this.add("hover\:bg-gray-300"); }
+get hoverBgGray_400() { return this.add("hover\:bg-gray-400"); }
+get hoverBgGray_500() { return this.add("hover\:bg-gray-500"); }
+get hoverBgGray_600() { return this.add("hover\:bg-gray-600"); }
+get hoverBgGray_700() { return this.add("hover\:bg-gray-700"); }
+get hoverBgGray_800() { return this.add("hover\:bg-gray-800"); }
+get hoverBgGray_900() { return this.add("hover\:bg-gray-900"); }
+get hoverBgRed_100() { return this.add("hover\:bg-red-100"); }
+get hoverBgRed_200() { return this.add("hover\:bg-red-200"); }
+get hoverBgRed_300() { return this.add("hover\:bg-red-300"); }
+get hoverBgRed_400() { return this.add("hover\:bg-red-400"); }
+get hoverBgRed_500() { return this.add("hover\:bg-red-500"); }
+get hoverBgRed_600() { return this.add("hover\:bg-red-600"); }
+get hoverBgRed_700() { return this.add("hover\:bg-red-700"); }
+get hoverBgRed_800() { return this.add("hover\:bg-red-800"); }
+get hoverBgRed_900() { return this.add("hover\:bg-red-900"); }
+get hoverBgOrange_100() { return this.add("hover\:bg-orange-100"); }
+get hoverBgOrange_200() { return this.add("hover\:bg-orange-200"); }
+get hoverBgOrange_300() { return this.add("hover\:bg-orange-300"); }
+get hoverBgOrange_400() { return this.add("hover\:bg-orange-400"); }
+get hoverBgOrange_500() { return this.add("hover\:bg-orange-500"); }
+get hoverBgOrange_600() { return this.add("hover\:bg-orange-600"); }
+get hoverBgOrange_700() { return this.add("hover\:bg-orange-700"); }
+get hoverBgOrange_800() { return this.add("hover\:bg-orange-800"); }
+get hoverBgOrange_900() { return this.add("hover\:bg-orange-900"); }
+get hoverBgYellow_100() { return this.add("hover\:bg-yellow-100"); }
+get hoverBgYellow_200() { return this.add("hover\:bg-yellow-200"); }
+get hoverBgYellow_300() { return this.add("hover\:bg-yellow-300"); }
+get hoverBgYellow_400() { return this.add("hover\:bg-yellow-400"); }
+get hoverBgYellow_500() { return this.add("hover\:bg-yellow-500"); }
+get hoverBgYellow_600() { return this.add("hover\:bg-yellow-600"); }
+get hoverBgYellow_700() { return this.add("hover\:bg-yellow-700"); }
+get hoverBgYellow_800() { return this.add("hover\:bg-yellow-800"); }
+get hoverBgYellow_900() { return this.add("hover\:bg-yellow-900"); }
+get hoverBgGreen_100() { return this.add("hover\:bg-green-100"); }
+get hoverBgGreen_200() { return this.add("hover\:bg-green-200"); }
+get hoverBgGreen_300() { return this.add("hover\:bg-green-300"); }
+get hoverBgGreen_400() { return this.add("hover\:bg-green-400"); }
+get hoverBgGreen_500() { return this.add("hover\:bg-green-500"); }
+get hoverBgGreen_600() { return this.add("hover\:bg-green-600"); }
+get hoverBgGreen_700() { return this.add("hover\:bg-green-700"); }
+get hoverBgGreen_800() { return this.add("hover\:bg-green-800"); }
+get hoverBgGreen_900() { return this.add("hover\:bg-green-900"); }
+get hoverBgTeal_100() { return this.add("hover\:bg-teal-100"); }
+get hoverBgTeal_200() { return this.add("hover\:bg-teal-200"); }
+get hoverBgTeal_300() { return this.add("hover\:bg-teal-300"); }
+get hoverBgTeal_400() { return this.add("hover\:bg-teal-400"); }
+get hoverBgTeal_500() { return this.add("hover\:bg-teal-500"); }
+get hoverBgTeal_600() { return this.add("hover\:bg-teal-600"); }
+get hoverBgTeal_700() { return this.add("hover\:bg-teal-700"); }
+get hoverBgTeal_800() { return this.add("hover\:bg-teal-800"); }
+get hoverBgTeal_900() { return this.add("hover\:bg-teal-900"); }
+get hoverBgBlue_100() { return this.add("hover\:bg-blue-100"); }
+get hoverBgBlue_200() { return this.add("hover\:bg-blue-200"); }
+get hoverBgBlue_300() { return this.add("hover\:bg-blue-300"); }
+get hoverBgBlue_400() { return this.add("hover\:bg-blue-400"); }
+get hoverBgBlue_500() { return this.add("hover\:bg-blue-500"); }
+get hoverBgBlue_600() { return this.add("hover\:bg-blue-600"); }
+get hoverBgBlue_700() { return this.add("hover\:bg-blue-700"); }
+get hoverBgBlue_800() { return this.add("hover\:bg-blue-800"); }
+get hoverBgBlue_900() { return this.add("hover\:bg-blue-900"); }
+get hoverBgIndigo_100() { return this.add("hover\:bg-indigo-100"); }
+get hoverBgIndigo_200() { return this.add("hover\:bg-indigo-200"); }
+get hoverBgIndigo_300() { return this.add("hover\:bg-indigo-300"); }
+get hoverBgIndigo_400() { return this.add("hover\:bg-indigo-400"); }
+get hoverBgIndigo_500() { return this.add("hover\:bg-indigo-500"); }
+get hoverBgIndigo_600() { return this.add("hover\:bg-indigo-600"); }
+get hoverBgIndigo_700() { return this.add("hover\:bg-indigo-700"); }
+get hoverBgIndigo_800() { return this.add("hover\:bg-indigo-800"); }
+get hoverBgIndigo_900() { return this.add("hover\:bg-indigo-900"); }
+get hoverBgPurple_100() { return this.add("hover\:bg-purple-100"); }
+get hoverBgPurple_200() { return this.add("hover\:bg-purple-200"); }
+get hoverBgPurple_300() { return this.add("hover\:bg-purple-300"); }
+get hoverBgPurple_400() { return this.add("hover\:bg-purple-400"); }
+get hoverBgPurple_500() { return this.add("hover\:bg-purple-500"); }
+get hoverBgPurple_600() { return this.add("hover\:bg-purple-600"); }
+get hoverBgPurple_700() { return this.add("hover\:bg-purple-700"); }
+get hoverBgPurple_800() { return this.add("hover\:bg-purple-800"); }
+get hoverBgPurple_900() { return this.add("hover\:bg-purple-900"); }
+get hoverBgPink_100() { return this.add("hover\:bg-pink-100"); }
+get hoverBgPink_200() { return this.add("hover\:bg-pink-200"); }
+get hoverBgPink_300() { return this.add("hover\:bg-pink-300"); }
+get hoverBgPink_400() { return this.add("hover\:bg-pink-400"); }
+get hoverBgPink_500() { return this.add("hover\:bg-pink-500"); }
+get hoverBgPink_600() { return this.add("hover\:bg-pink-600"); }
+get hoverBgPink_700() { return this.add("hover\:bg-pink-700"); }
+get hoverBgPink_800() { return this.add("hover\:bg-pink-800"); }
+get hoverBgPink_900() { return this.add("hover\:bg-pink-900"); }
 get bgBottom() { return this.add("bg-bottom"); }
 get bgCenter() { return this.add("bg-center"); }
 get bgLeft() { return this.add("bg-left"); }
@@ -307,9 +449,103 @@ get borderPink_600() { return this.add("border-pink-600"); }
 get borderPink_700() { return this.add("border-pink-700"); }
 get borderPink_800() { return this.add("border-pink-800"); }
 get borderPink_900() { return this.add("border-pink-900"); }
+get hoverBorderTransparent() { return this.add("hover\:border-transparent"); }
+get hoverBorderBlack() { return this.add("hover\:border-black"); }
+get hoverBorderWhite() { return this.add("hover\:border-white"); }
+get hoverBorderGray_100() { return this.add("hover\:border-gray-100"); }
+get hoverBorderGray_200() { return this.add("hover\:border-gray-200"); }
+get hoverBorderGray_300() { return this.add("hover\:border-gray-300"); }
+get hoverBorderGray_400() { return this.add("hover\:border-gray-400"); }
+get hoverBorderGray_500() { return this.add("hover\:border-gray-500"); }
+get hoverBorderGray_600() { return this.add("hover\:border-gray-600"); }
+get hoverBorderGray_700() { return this.add("hover\:border-gray-700"); }
+get hoverBorderGray_800() { return this.add("hover\:border-gray-800"); }
+get hoverBorderGray_900() { return this.add("hover\:border-gray-900"); }
+get hoverBorderRed_100() { return this.add("hover\:border-red-100"); }
+get hoverBorderRed_200() { return this.add("hover\:border-red-200"); }
+get hoverBorderRed_300() { return this.add("hover\:border-red-300"); }
+get hoverBorderRed_400() { return this.add("hover\:border-red-400"); }
+get hoverBorderRed_500() { return this.add("hover\:border-red-500"); }
+get hoverBorderRed_600() { return this.add("hover\:border-red-600"); }
+get hoverBorderRed_700() { return this.add("hover\:border-red-700"); }
+get hoverBorderRed_800() { return this.add("hover\:border-red-800"); }
+get hoverBorderRed_900() { return this.add("hover\:border-red-900"); }
+get hoverBorderOrange_100() { return this.add("hover\:border-orange-100"); }
+get hoverBorderOrange_200() { return this.add("hover\:border-orange-200"); }
+get hoverBorderOrange_300() { return this.add("hover\:border-orange-300"); }
+get hoverBorderOrange_400() { return this.add("hover\:border-orange-400"); }
+get hoverBorderOrange_500() { return this.add("hover\:border-orange-500"); }
+get hoverBorderOrange_600() { return this.add("hover\:border-orange-600"); }
+get hoverBorderOrange_700() { return this.add("hover\:border-orange-700"); }
+get hoverBorderOrange_800() { return this.add("hover\:border-orange-800"); }
+get hoverBorderOrange_900() { return this.add("hover\:border-orange-900"); }
+get hoverBorderYellow_100() { return this.add("hover\:border-yellow-100"); }
+get hoverBorderYellow_200() { return this.add("hover\:border-yellow-200"); }
+get hoverBorderYellow_300() { return this.add("hover\:border-yellow-300"); }
+get hoverBorderYellow_400() { return this.add("hover\:border-yellow-400"); }
+get hoverBorderYellow_500() { return this.add("hover\:border-yellow-500"); }
+get hoverBorderYellow_600() { return this.add("hover\:border-yellow-600"); }
+get hoverBorderYellow_700() { return this.add("hover\:border-yellow-700"); }
+get hoverBorderYellow_800() { return this.add("hover\:border-yellow-800"); }
+get hoverBorderYellow_900() { return this.add("hover\:border-yellow-900"); }
+get hoverBorderGreen_100() { return this.add("hover\:border-green-100"); }
+get hoverBorderGreen_200() { return this.add("hover\:border-green-200"); }
+get hoverBorderGreen_300() { return this.add("hover\:border-green-300"); }
+get hoverBorderGreen_400() { return this.add("hover\:border-green-400"); }
+get hoverBorderGreen_500() { return this.add("hover\:border-green-500"); }
+get hoverBorderGreen_600() { return this.add("hover\:border-green-600"); }
+get hoverBorderGreen_700() { return this.add("hover\:border-green-700"); }
+get hoverBorderGreen_800() { return this.add("hover\:border-green-800"); }
+get hoverBorderGreen_900() { return this.add("hover\:border-green-900"); }
+get hoverBorderTeal_100() { return this.add("hover\:border-teal-100"); }
+get hoverBorderTeal_200() { return this.add("hover\:border-teal-200"); }
+get hoverBorderTeal_300() { return this.add("hover\:border-teal-300"); }
+get hoverBorderTeal_400() { return this.add("hover\:border-teal-400"); }
+get hoverBorderTeal_500() { return this.add("hover\:border-teal-500"); }
+get hoverBorderTeal_600() { return this.add("hover\:border-teal-600"); }
+get hoverBorderTeal_700() { return this.add("hover\:border-teal-700"); }
+get hoverBorderTeal_800() { return this.add("hover\:border-teal-800"); }
+get hoverBorderTeal_900() { return this.add("hover\:border-teal-900"); }
+get hoverBorderBlue_100() { return this.add("hover\:border-blue-100"); }
+get hoverBorderBlue_200() { return this.add("hover\:border-blue-200"); }
+get hoverBorderBlue_300() { return this.add("hover\:border-blue-300"); }
+get hoverBorderBlue_400() { return this.add("hover\:border-blue-400"); }
+get hoverBorderBlue_500() { return this.add("hover\:border-blue-500"); }
+get hoverBorderBlue_600() { return this.add("hover\:border-blue-600"); }
+get hoverBorderBlue_700() { return this.add("hover\:border-blue-700"); }
+get hoverBorderBlue_800() { return this.add("hover\:border-blue-800"); }
+get hoverBorderBlue_900() { return this.add("hover\:border-blue-900"); }
+get hoverBorderIndigo_100() { return this.add("hover\:border-indigo-100"); }
+get hoverBorderIndigo_200() { return this.add("hover\:border-indigo-200"); }
+get hoverBorderIndigo_300() { return this.add("hover\:border-indigo-300"); }
+get hoverBorderIndigo_400() { return this.add("hover\:border-indigo-400"); }
+get hoverBorderIndigo_500() { return this.add("hover\:border-indigo-500"); }
+get hoverBorderIndigo_600() { return this.add("hover\:border-indigo-600"); }
+get hoverBorderIndigo_700() { return this.add("hover\:border-indigo-700"); }
+get hoverBorderIndigo_800() { return this.add("hover\:border-indigo-800"); }
+get hoverBorderIndigo_900() { return this.add("hover\:border-indigo-900"); }
+get hoverBorderPurple_100() { return this.add("hover\:border-purple-100"); }
+get hoverBorderPurple_200() { return this.add("hover\:border-purple-200"); }
+get hoverBorderPurple_300() { return this.add("hover\:border-purple-300"); }
+get hoverBorderPurple_400() { return this.add("hover\:border-purple-400"); }
+get hoverBorderPurple_500() { return this.add("hover\:border-purple-500"); }
+get hoverBorderPurple_600() { return this.add("hover\:border-purple-600"); }
+get hoverBorderPurple_700() { return this.add("hover\:border-purple-700"); }
+get hoverBorderPurple_800() { return this.add("hover\:border-purple-800"); }
+get hoverBorderPurple_900() { return this.add("hover\:border-purple-900"); }
+get hoverBorderPink_100() { return this.add("hover\:border-pink-100"); }
+get hoverBorderPink_200() { return this.add("hover\:border-pink-200"); }
+get hoverBorderPink_300() { return this.add("hover\:border-pink-300"); }
+get hoverBorderPink_400() { return this.add("hover\:border-pink-400"); }
+get hoverBorderPink_500() { return this.add("hover\:border-pink-500"); }
+get hoverBorderPink_600() { return this.add("hover\:border-pink-600"); }
+get hoverBorderPink_700() { return this.add("hover\:border-pink-700"); }
+get hoverBorderPink_800() { return this.add("hover\:border-pink-800"); }
+get hoverBorderPink_900() { return this.add("hover\:border-pink-900"); }
 get roundedNone() { return this.add("rounded-none"); }
 get roundedSm() { return this.add("rounded-sm"); }
 get rounded() { return this.add("rounded"); }
+get roundedMd() { return this.add("rounded-md"); }
 get roundedLg() { return this.add("rounded-lg"); }
 get roundedFull() { return this.add("rounded-full"); }
 get roundedTNone() { return this.add("rounded-t-none"); }
@@ -324,6 +560,10 @@ get roundedT() { return this.add("rounded-t"); }
 get roundedR() { return this.add("rounded-r"); }
 get roundedB() { return this.add("rounded-b"); }
 get roundedL() { return this.add("rounded-l"); }
+get roundedTMd() { return this.add("rounded-t-md"); }
+get roundedRMd() { return this.add("rounded-r-md"); }
+get roundedBMd() { return this.add("rounded-b-md"); }
+get roundedLMd() { return this.add("rounded-l-md"); }
 get roundedTLg() { return this.add("rounded-t-lg"); }
 get roundedRLg() { return this.add("rounded-r-lg"); }
 get roundedBLg() { return this.add("rounded-b-lg"); }
@@ -344,6 +584,10 @@ get roundedTl() { return this.add("rounded-tl"); }
 get roundedTr() { return this.add("rounded-tr"); }
 get roundedBr() { return this.add("rounded-br"); }
 get roundedBl() { return this.add("rounded-bl"); }
+get roundedTlMd() { return this.add("rounded-tl-md"); }
+get roundedTrMd() { return this.add("rounded-tr-md"); }
+get roundedBrMd() { return this.add("rounded-br-md"); }
+get roundedBlMd() { return this.add("rounded-bl-md"); }
 get roundedTlLg() { return this.add("rounded-tl-lg"); }
 get roundedTrLg() { return this.add("rounded-tr-lg"); }
 get roundedBrLg() { return this.add("rounded-br-lg"); }
@@ -355,6 +599,7 @@ get roundedBlFull() { return this.add("rounded-bl-full"); }
 get borderSolid() { return this.add("border-solid"); }
 get borderDashed() { return this.add("border-dashed"); }
 get borderDotted() { return this.add("border-dotted"); }
+get borderDouble() { return this.add("border-double"); }
 get borderNone() { return this.add("border-none"); }
 get border_0() { return this.add("border-0"); }
 get border_2() { return this.add("border-2"); }
@@ -381,6 +626,8 @@ get borderT() { return this.add("border-t"); }
 get borderR() { return this.add("border-r"); }
 get borderB() { return this.add("border-b"); }
 get borderL() { return this.add("border-l"); }
+get boxBorder() { return this.add("box-border"); }
+get boxContent() { return this.add("box-content"); }
 get cursorAuto() { return this.add("cursor-auto"); }
 get cursorDefault() { return this.add("cursor-default"); }
 get cursorPointer() { return this.add("cursor-pointer"); }
@@ -393,9 +640,16 @@ get inlineBlock() { return this.add("inline-block"); }
 get inline() { return this.add("inline"); }
 get flex() { return this.add("flex"); }
 get inlineFlex() { return this.add("inline-flex"); }
+get grid() { return this.add("grid"); }
 get table() { return this.add("table"); }
-get tableRow() { return this.add("table-row"); }
+get tableCaption() { return this.add("table-caption"); }
 get tableCell() { return this.add("table-cell"); }
+get tableColumn() { return this.add("table-column"); }
+get tableColumnGroup() { return this.add("table-column-group"); }
+get tableFooterGroup() { return this.add("table-footer-group"); }
+get tableHeaderGroup() { return this.add("table-header-group"); }
+get tableRowGroup() { return this.add("table-row-group"); }
+get tableRow() { return this.add("table-row"); }
 get hidden() { return this.add("hidden"); }
 get flexRow() { return this.add("flex-row"); }
 get flexRowReverse() { return this.add("flex-row-reverse"); }
@@ -419,6 +673,7 @@ get justifyEnd() { return this.add("justify-end"); }
 get justifyCenter() { return this.add("justify-center"); }
 get justifyBetween() { return this.add("justify-between"); }
 get justifyAround() { return this.add("justify-around"); }
+get justifyEvenly() { return this.add("justify-evenly"); }
 get contentCenter() { return this.add("content-center"); }
 get contentStart() { return this.add("content-start"); }
 get contentEnd() { return this.add("content-end"); }
@@ -450,6 +705,9 @@ get orderNone() { return this.add("order-none"); }
 get floatRight() { return this.add("float-right"); }
 get floatLeft() { return this.add("float-left"); }
 get floatNone() { return this.add("float-none"); }
+get clearLeft() { return this.add("clear-left"); }
+get clearRight() { return this.add("clear-right"); }
+get clearBoth() { return this.add("clear-both"); }
 get fontSans() { return this.add("font-sans"); }
 get fontSerif() { return this.add("font-serif"); }
 get fontMono() { return this.add("font-mono"); }
@@ -462,6 +720,15 @@ get fontSemibold() { return this.add("font-semibold"); }
 get fontBold() { return this.add("font-bold"); }
 get fontExtrabold() { return this.add("font-extrabold"); }
 get fontBlack() { return this.add("font-black"); }
+get hoverFontHairline() { return this.add("hover\:font-hairline"); }
+get hoverFontThin() { return this.add("hover\:font-thin"); }
+get hoverFontLight() { return this.add("hover\:font-light"); }
+get hoverFontNormal() { return this.add("hover\:font-normal"); }
+get hoverFontMedium() { return this.add("hover\:font-medium"); }
+get hoverFontSemibold() { return this.add("hover\:font-semibold"); }
+get hoverFontBold() { return this.add("hover\:font-bold"); }
+get hoverFontExtrabold() { return this.add("hover\:font-extrabold"); }
+get hoverFontBlack() { return this.add("hover\:font-black"); }
 get h_0() { return this.add("h-0"); }
 get h_1() { return this.add("h-1"); }
 get h_2() { return this.add("h-2"); }
@@ -484,6 +751,14 @@ get hAuto() { return this.add("h-auto"); }
 get hPx() { return this.add("h-px"); }
 get hFull() { return this.add("h-full"); }
 get hScreen() { return this.add("h-screen"); }
+get leading_3() { return this.add("leading-3"); }
+get leading_4() { return this.add("leading-4"); }
+get leading_5() { return this.add("leading-5"); }
+get leading_6() { return this.add("leading-6"); }
+get leading_7() { return this.add("leading-7"); }
+get leading_8() { return this.add("leading-8"); }
+get leading_9() { return this.add("leading-9"); }
+get leading_10() { return this.add("leading-10"); }
 get leadingNone() { return this.add("leading-none"); }
 get leadingTight() { return this.add("leading-tight"); }
 get leadingSnug() { return this.add("leading-snug"); }
@@ -637,6 +912,7 @@ get mbPx() { return this.add("mb-px"); }
 get mlPx() { return this.add("ml-px"); }
 get maxHFull() { return this.add("max-h-full"); }
 get maxHScreen() { return this.add("max-h-screen"); }
+get maxWNone() { return this.add("max-w-none"); }
 get maxWXs() { return this.add("max-w-xs"); }
 get maxWSm() { return this.add("max-w-sm"); }
 get maxWMd() { return this.add("max-w-md"); }
@@ -648,6 +924,10 @@ get maxW_4xl() { return this.add("max-w-4xl"); }
 get maxW_5xl() { return this.add("max-w-5xl"); }
 get maxW_6xl() { return this.add("max-w-6xl"); }
 get maxWFull() { return this.add("max-w-full"); }
+get maxWScreenSm() { return this.add("max-w-screen-sm"); }
+get maxWScreenMd() { return this.add("max-w-screen-md"); }
+get maxWScreenLg() { return this.add("max-w-screen-lg"); }
+get maxWScreenXl() { return this.add("max-w-screen-xl"); }
 get minH_0() { return this.add("min-h-0"); }
 get minHFull() { return this.add("min-h-full"); }
 get minHScreen() { return this.add("min-h-screen"); }
@@ -672,6 +952,11 @@ get opacity_25() { return this.add("opacity-25"); }
 get opacity_50() { return this.add("opacity-50"); }
 get opacity_75() { return this.add("opacity-75"); }
 get opacity_100() { return this.add("opacity-100"); }
+get hoverOpacity_0() { return this.add("hover\:opacity-0"); }
+get hoverOpacity_25() { return this.add("hover\:opacity-25"); }
+get hoverOpacity_50() { return this.add("hover\:opacity-50"); }
+get hoverOpacity_75() { return this.add("hover\:opacity-75"); }
+get hoverOpacity_100() { return this.add("hover\:opacity-100"); }
 get outlineNone() { return this.add("outline-none"); }
 get overflowAuto() { return this.add("overflow-auto"); }
 get overflowHidden() { return this.add("overflow-hidden"); }
@@ -845,6 +1130,8 @@ get resizeNone() { return this.add("resize-none"); }
 get resizeY() { return this.add("resize-y"); }
 get resizeX() { return this.add("resize-x"); }
 get resize() { return this.add("resize"); }
+get shadowXs() { return this.add("shadow-xs"); }
+get shadowSm() { return this.add("shadow-sm"); }
 get shadow() { return this.add("shadow"); }
 get shadowMd() { return this.add("shadow-md"); }
 get shadowLg() { return this.add("shadow-lg"); }
@@ -853,8 +1140,21 @@ get shadow_2xl() { return this.add("shadow-2xl"); }
 get shadowInner() { return this.add("shadow-inner"); }
 get shadowOutline() { return this.add("shadow-outline"); }
 get shadowNone() { return this.add("shadow-none"); }
+get hoverShadowXs() { return this.add("hover\:shadow-xs"); }
+get hoverShadowSm() { return this.add("hover\:shadow-sm"); }
+get hoverShadow() { return this.add("hover\:shadow"); }
+get hoverShadowMd() { return this.add("hover\:shadow-md"); }
+get hoverShadowLg() { return this.add("hover\:shadow-lg"); }
+get hoverShadowXl() { return this.add("hover\:shadow-xl"); }
+get hoverShadow_2xl() { return this.add("hover\:shadow-2xl"); }
+get hoverShadowInner() { return this.add("hover\:shadow-inner"); }
+get hoverShadowOutline() { return this.add("hover\:shadow-outline"); }
+get hoverShadowNone() { return this.add("hover\:shadow-none"); }
 get fillCurrent() { return this.add("fill-current"); }
 get strokeCurrent() { return this.add("stroke-current"); }
+get stroke_0() { return this.add("stroke-0"); }
+get stroke_1() { return this.add("stroke-1"); }
+get stroke_2() { return this.add("stroke-2"); }
 get tableAuto() { return this.add("table-auto"); }
 get tableFixed() { return this.add("table-fixed"); }
 get textLeft() { return this.add("text-left"); }
@@ -954,6 +1254,99 @@ get textPink_600() { return this.add("text-pink-600"); }
 get textPink_700() { return this.add("text-pink-700"); }
 get textPink_800() { return this.add("text-pink-800"); }
 get textPink_900() { return this.add("text-pink-900"); }
+get hoverTextTransparent() { return this.add("hover\:text-transparent"); }
+get hoverTextBlack() { return this.add("hover\:text-black"); }
+get hoverTextWhite() { return this.add("hover\:text-white"); }
+get hoverTextGray_100() { return this.add("hover\:text-gray-100"); }
+get hoverTextGray_200() { return this.add("hover\:text-gray-200"); }
+get hoverTextGray_300() { return this.add("hover\:text-gray-300"); }
+get hoverTextGray_400() { return this.add("hover\:text-gray-400"); }
+get hoverTextGray_500() { return this.add("hover\:text-gray-500"); }
+get hoverTextGray_600() { return this.add("hover\:text-gray-600"); }
+get hoverTextGray_700() { return this.add("hover\:text-gray-700"); }
+get hoverTextGray_800() { return this.add("hover\:text-gray-800"); }
+get hoverTextGray_900() { return this.add("hover\:text-gray-900"); }
+get hoverTextRed_100() { return this.add("hover\:text-red-100"); }
+get hoverTextRed_200() { return this.add("hover\:text-red-200"); }
+get hoverTextRed_300() { return this.add("hover\:text-red-300"); }
+get hoverTextRed_400() { return this.add("hover\:text-red-400"); }
+get hoverTextRed_500() { return this.add("hover\:text-red-500"); }
+get hoverTextRed_600() { return this.add("hover\:text-red-600"); }
+get hoverTextRed_700() { return this.add("hover\:text-red-700"); }
+get hoverTextRed_800() { return this.add("hover\:text-red-800"); }
+get hoverTextRed_900() { return this.add("hover\:text-red-900"); }
+get hoverTextOrange_100() { return this.add("hover\:text-orange-100"); }
+get hoverTextOrange_200() { return this.add("hover\:text-orange-200"); }
+get hoverTextOrange_300() { return this.add("hover\:text-orange-300"); }
+get hoverTextOrange_400() { return this.add("hover\:text-orange-400"); }
+get hoverTextOrange_500() { return this.add("hover\:text-orange-500"); }
+get hoverTextOrange_600() { return this.add("hover\:text-orange-600"); }
+get hoverTextOrange_700() { return this.add("hover\:text-orange-700"); }
+get hoverTextOrange_800() { return this.add("hover\:text-orange-800"); }
+get hoverTextOrange_900() { return this.add("hover\:text-orange-900"); }
+get hoverTextYellow_100() { return this.add("hover\:text-yellow-100"); }
+get hoverTextYellow_200() { return this.add("hover\:text-yellow-200"); }
+get hoverTextYellow_300() { return this.add("hover\:text-yellow-300"); }
+get hoverTextYellow_400() { return this.add("hover\:text-yellow-400"); }
+get hoverTextYellow_500() { return this.add("hover\:text-yellow-500"); }
+get hoverTextYellow_600() { return this.add("hover\:text-yellow-600"); }
+get hoverTextYellow_700() { return this.add("hover\:text-yellow-700"); }
+get hoverTextYellow_800() { return this.add("hover\:text-yellow-800"); }
+get hoverTextYellow_900() { return this.add("hover\:text-yellow-900"); }
+get hoverTextGreen_100() { return this.add("hover\:text-green-100"); }
+get hoverTextGreen_200() { return this.add("hover\:text-green-200"); }
+get hoverTextGreen_300() { return this.add("hover\:text-green-300"); }
+get hoverTextGreen_400() { return this.add("hover\:text-green-400"); }
+get hoverTextGreen_500() { return this.add("hover\:text-green-500"); }
+get hoverTextGreen_600() { return this.add("hover\:text-green-600"); }
+get hoverTextGreen_700() { return this.add("hover\:text-green-700"); }
+get hoverTextGreen_800() { return this.add("hover\:text-green-800"); }
+get hoverTextGreen_900() { return this.add("hover\:text-green-900"); }
+get hoverTextTeal_100() { return this.add("hover\:text-teal-100"); }
+get hoverTextTeal_200() { return this.add("hover\:text-teal-200"); }
+get hoverTextTeal_300() { return this.add("hover\:text-teal-300"); }
+get hoverTextTeal_400() { return this.add("hover\:text-teal-400"); }
+get hoverTextTeal_500() { return this.add("hover\:text-teal-500"); }
+get hoverTextTeal_600() { return this.add("hover\:text-teal-600"); }
+get hoverTextTeal_700() { return this.add("hover\:text-teal-700"); }
+get hoverTextTeal_800() { return this.add("hover\:text-teal-800"); }
+get hoverTextTeal_900() { return this.add("hover\:text-teal-900"); }
+get hoverTextBlue_100() { return this.add("hover\:text-blue-100"); }
+get hoverTextBlue_200() { return this.add("hover\:text-blue-200"); }
+get hoverTextBlue_300() { return this.add("hover\:text-blue-300"); }
+get hoverTextBlue_400() { return this.add("hover\:text-blue-400"); }
+get hoverTextBlue_500() { return this.add("hover\:text-blue-500"); }
+get hoverTextBlue_600() { return this.add("hover\:text-blue-600"); }
+get hoverTextBlue_700() { return this.add("hover\:text-blue-700"); }
+get hoverTextBlue_800() { return this.add("hover\:text-blue-800"); }
+get hoverTextBlue_900() { return this.add("hover\:text-blue-900"); }
+get hoverTextIndigo_100() { return this.add("hover\:text-indigo-100"); }
+get hoverTextIndigo_200() { return this.add("hover\:text-indigo-200"); }
+get hoverTextIndigo_300() { return this.add("hover\:text-indigo-300"); }
+get hoverTextIndigo_400() { return this.add("hover\:text-indigo-400"); }
+get hoverTextIndigo_500() { return this.add("hover\:text-indigo-500"); }
+get hoverTextIndigo_600() { return this.add("hover\:text-indigo-600"); }
+get hoverTextIndigo_700() { return this.add("hover\:text-indigo-700"); }
+get hoverTextIndigo_800() { return this.add("hover\:text-indigo-800"); }
+get hoverTextIndigo_900() { return this.add("hover\:text-indigo-900"); }
+get hoverTextPurple_100() { return this.add("hover\:text-purple-100"); }
+get hoverTextPurple_200() { return this.add("hover\:text-purple-200"); }
+get hoverTextPurple_300() { return this.add("hover\:text-purple-300"); }
+get hoverTextPurple_400() { return this.add("hover\:text-purple-400"); }
+get hoverTextPurple_500() { return this.add("hover\:text-purple-500"); }
+get hoverTextPurple_600() { return this.add("hover\:text-purple-600"); }
+get hoverTextPurple_700() { return this.add("hover\:text-purple-700"); }
+get hoverTextPurple_800() { return this.add("hover\:text-purple-800"); }
+get hoverTextPurple_900() { return this.add("hover\:text-purple-900"); }
+get hoverTextPink_100() { return this.add("hover\:text-pink-100"); }
+get hoverTextPink_200() { return this.add("hover\:text-pink-200"); }
+get hoverTextPink_300() { return this.add("hover\:text-pink-300"); }
+get hoverTextPink_400() { return this.add("hover\:text-pink-400"); }
+get hoverTextPink_500() { return this.add("hover\:text-pink-500"); }
+get hoverTextPink_600() { return this.add("hover\:text-pink-600"); }
+get hoverTextPink_700() { return this.add("hover\:text-pink-700"); }
+get hoverTextPink_800() { return this.add("hover\:text-pink-800"); }
+get hoverTextPink_900() { return this.add("hover\:text-pink-900"); }
 get textXs() { return this.add("text-xs"); }
 get textSm() { return this.add("text-sm"); }
 get textBase() { return this.add("text-base"); }
@@ -973,6 +1366,9 @@ get normalCase() { return this.add("normal-case"); }
 get underline() { return this.add("underline"); }
 get lineThrough() { return this.add("line-through"); }
 get noUnderline() { return this.add("no-underline"); }
+get hoverUnderline() { return this.add("hover\:underline"); }
+get hoverLineThrough() { return this.add("hover\:line-through"); }
+get hoverNoUnderline() { return this.add("hover\:no-underline"); }
 get antialiased() { return this.add("antialiased"); }
 get subpixelAntialiased() { return this.add("subpixel-antialiased"); }
 get trackingTighter() { return this.add("tracking-tighter"); }
@@ -1057,6 +1453,349 @@ get z_30() { return this.add("z-30"); }
 get z_40() { return this.add("z-40"); }
 get z_50() { return this.add("z-50"); }
 get zAuto() { return this.add("z-auto"); }
+get gap_0() { return this.add("gap-0"); }
+get gap_1() { return this.add("gap-1"); }
+get gap_2() { return this.add("gap-2"); }
+get gap_3() { return this.add("gap-3"); }
+get gap_4() { return this.add("gap-4"); }
+get gap_5() { return this.add("gap-5"); }
+get gap_6() { return this.add("gap-6"); }
+get gap_8() { return this.add("gap-8"); }
+get gap_10() { return this.add("gap-10"); }
+get gap_12() { return this.add("gap-12"); }
+get gap_16() { return this.add("gap-16"); }
+get gap_20() { return this.add("gap-20"); }
+get gap_24() { return this.add("gap-24"); }
+get gap_32() { return this.add("gap-32"); }
+get gap_40() { return this.add("gap-40"); }
+get gap_48() { return this.add("gap-48"); }
+get gap_56() { return this.add("gap-56"); }
+get gap_64() { return this.add("gap-64"); }
+get gapPx() { return this.add("gap-px"); }
+get colGap_0() { return this.add("col-gap-0"); }
+get colGap_1() { return this.add("col-gap-1"); }
+get colGap_2() { return this.add("col-gap-2"); }
+get colGap_3() { return this.add("col-gap-3"); }
+get colGap_4() { return this.add("col-gap-4"); }
+get colGap_5() { return this.add("col-gap-5"); }
+get colGap_6() { return this.add("col-gap-6"); }
+get colGap_8() { return this.add("col-gap-8"); }
+get colGap_10() { return this.add("col-gap-10"); }
+get colGap_12() { return this.add("col-gap-12"); }
+get colGap_16() { return this.add("col-gap-16"); }
+get colGap_20() { return this.add("col-gap-20"); }
+get colGap_24() { return this.add("col-gap-24"); }
+get colGap_32() { return this.add("col-gap-32"); }
+get colGap_40() { return this.add("col-gap-40"); }
+get colGap_48() { return this.add("col-gap-48"); }
+get colGap_56() { return this.add("col-gap-56"); }
+get colGap_64() { return this.add("col-gap-64"); }
+get colGapPx() { return this.add("col-gap-px"); }
+get rowGap_0() { return this.add("row-gap-0"); }
+get rowGap_1() { return this.add("row-gap-1"); }
+get rowGap_2() { return this.add("row-gap-2"); }
+get rowGap_3() { return this.add("row-gap-3"); }
+get rowGap_4() { return this.add("row-gap-4"); }
+get rowGap_5() { return this.add("row-gap-5"); }
+get rowGap_6() { return this.add("row-gap-6"); }
+get rowGap_8() { return this.add("row-gap-8"); }
+get rowGap_10() { return this.add("row-gap-10"); }
+get rowGap_12() { return this.add("row-gap-12"); }
+get rowGap_16() { return this.add("row-gap-16"); }
+get rowGap_20() { return this.add("row-gap-20"); }
+get rowGap_24() { return this.add("row-gap-24"); }
+get rowGap_32() { return this.add("row-gap-32"); }
+get rowGap_40() { return this.add("row-gap-40"); }
+get rowGap_48() { return this.add("row-gap-48"); }
+get rowGap_56() { return this.add("row-gap-56"); }
+get rowGap_64() { return this.add("row-gap-64"); }
+get rowGapPx() { return this.add("row-gap-px"); }
+get gridFlowRow() { return this.add("grid-flow-row"); }
+get gridFlowCol() { return this.add("grid-flow-col"); }
+get gridFlowRowDense() { return this.add("grid-flow-row-dense"); }
+get gridFlowColDense() { return this.add("grid-flow-col-dense"); }
+get gridCols_1() { return this.add("grid-cols-1"); }
+get gridCols_2() { return this.add("grid-cols-2"); }
+get gridCols_3() { return this.add("grid-cols-3"); }
+get gridCols_4() { return this.add("grid-cols-4"); }
+get gridCols_5() { return this.add("grid-cols-5"); }
+get gridCols_6() { return this.add("grid-cols-6"); }
+get gridCols_7() { return this.add("grid-cols-7"); }
+get gridCols_8() { return this.add("grid-cols-8"); }
+get gridCols_9() { return this.add("grid-cols-9"); }
+get gridCols_10() { return this.add("grid-cols-10"); }
+get gridCols_11() { return this.add("grid-cols-11"); }
+get gridCols_12() { return this.add("grid-cols-12"); }
+get gridColsNone() { return this.add("grid-cols-none"); }
+get colAuto() { return this.add("col-auto"); }
+get colSpan_1() { return this.add("col-span-1"); }
+get colSpan_2() { return this.add("col-span-2"); }
+get colSpan_3() { return this.add("col-span-3"); }
+get colSpan_4() { return this.add("col-span-4"); }
+get colSpan_5() { return this.add("col-span-5"); }
+get colSpan_6() { return this.add("col-span-6"); }
+get colSpan_7() { return this.add("col-span-7"); }
+get colSpan_8() { return this.add("col-span-8"); }
+get colSpan_9() { return this.add("col-span-9"); }
+get colSpan_10() { return this.add("col-span-10"); }
+get colSpan_11() { return this.add("col-span-11"); }
+get colSpan_12() { return this.add("col-span-12"); }
+get colStart_1() { return this.add("col-start-1"); }
+get colStart_2() { return this.add("col-start-2"); }
+get colStart_3() { return this.add("col-start-3"); }
+get colStart_4() { return this.add("col-start-4"); }
+get colStart_5() { return this.add("col-start-5"); }
+get colStart_6() { return this.add("col-start-6"); }
+get colStart_7() { return this.add("col-start-7"); }
+get colStart_8() { return this.add("col-start-8"); }
+get colStart_9() { return this.add("col-start-9"); }
+get colStart_10() { return this.add("col-start-10"); }
+get colStart_11() { return this.add("col-start-11"); }
+get colStart_12() { return this.add("col-start-12"); }
+get colStart_13() { return this.add("col-start-13"); }
+get colStartAuto() { return this.add("col-start-auto"); }
+get colEnd_1() { return this.add("col-end-1"); }
+get colEnd_2() { return this.add("col-end-2"); }
+get colEnd_3() { return this.add("col-end-3"); }
+get colEnd_4() { return this.add("col-end-4"); }
+get colEnd_5() { return this.add("col-end-5"); }
+get colEnd_6() { return this.add("col-end-6"); }
+get colEnd_7() { return this.add("col-end-7"); }
+get colEnd_8() { return this.add("col-end-8"); }
+get colEnd_9() { return this.add("col-end-9"); }
+get colEnd_10() { return this.add("col-end-10"); }
+get colEnd_11() { return this.add("col-end-11"); }
+get colEnd_12() { return this.add("col-end-12"); }
+get colEnd_13() { return this.add("col-end-13"); }
+get colEndAuto() { return this.add("col-end-auto"); }
+get gridRows_1() { return this.add("grid-rows-1"); }
+get gridRows_2() { return this.add("grid-rows-2"); }
+get gridRows_3() { return this.add("grid-rows-3"); }
+get gridRows_4() { return this.add("grid-rows-4"); }
+get gridRows_5() { return this.add("grid-rows-5"); }
+get gridRows_6() { return this.add("grid-rows-6"); }
+get gridRowsNone() { return this.add("grid-rows-none"); }
+get rowAuto() { return this.add("row-auto"); }
+get rowSpan_1() { return this.add("row-span-1"); }
+get rowSpan_2() { return this.add("row-span-2"); }
+get rowSpan_3() { return this.add("row-span-3"); }
+get rowSpan_4() { return this.add("row-span-4"); }
+get rowSpan_5() { return this.add("row-span-5"); }
+get rowSpan_6() { return this.add("row-span-6"); }
+get rowStart_1() { return this.add("row-start-1"); }
+get rowStart_2() { return this.add("row-start-2"); }
+get rowStart_3() { return this.add("row-start-3"); }
+get rowStart_4() { return this.add("row-start-4"); }
+get rowStart_5() { return this.add("row-start-5"); }
+get rowStart_6() { return this.add("row-start-6"); }
+get rowStart_7() { return this.add("row-start-7"); }
+get rowStartAuto() { return this.add("row-start-auto"); }
+get rowEnd_1() { return this.add("row-end-1"); }
+get rowEnd_2() { return this.add("row-end-2"); }
+get rowEnd_3() { return this.add("row-end-3"); }
+get rowEnd_4() { return this.add("row-end-4"); }
+get rowEnd_5() { return this.add("row-end-5"); }
+get rowEnd_6() { return this.add("row-end-6"); }
+get rowEnd_7() { return this.add("row-end-7"); }
+get rowEndAuto() { return this.add("row-end-auto"); }
+get transform() { return this.add("transform"); }
+get transformNone() { return this.add("transform-none"); }
+get originCenter() { return this.add("origin-center"); }
+get originTop() { return this.add("origin-top"); }
+get originTopRight() { return this.add("origin-top-right"); }
+get originRight() { return this.add("origin-right"); }
+get originBottomRight() { return this.add("origin-bottom-right"); }
+get originBottom() { return this.add("origin-bottom"); }
+get originBottomLeft() { return this.add("origin-bottom-left"); }
+get originLeft() { return this.add("origin-left"); }
+get originTopLeft() { return this.add("origin-top-left"); }
+get scale_0() { return this.add("scale-0"); }
+get scale_50() { return this.add("scale-50"); }
+get scale_75() { return this.add("scale-75"); }
+get scale_90() { return this.add("scale-90"); }
+get scale_95() { return this.add("scale-95"); }
+get scale_100() { return this.add("scale-100"); }
+get scale_105() { return this.add("scale-105"); }
+get scale_110() { return this.add("scale-110"); }
+get scale_125() { return this.add("scale-125"); }
+get scale_150() { return this.add("scale-150"); }
+get scaleX_0() { return this.add("scale-x-0"); }
+get scaleX_50() { return this.add("scale-x-50"); }
+get scaleX_75() { return this.add("scale-x-75"); }
+get scaleX_90() { return this.add("scale-x-90"); }
+get scaleX_95() { return this.add("scale-x-95"); }
+get scaleX_100() { return this.add("scale-x-100"); }
+get scaleX_105() { return this.add("scale-x-105"); }
+get scaleX_110() { return this.add("scale-x-110"); }
+get scaleX_125() { return this.add("scale-x-125"); }
+get scaleX_150() { return this.add("scale-x-150"); }
+get scaleY_0() { return this.add("scale-y-0"); }
+get scaleY_50() { return this.add("scale-y-50"); }
+get scaleY_75() { return this.add("scale-y-75"); }
+get scaleY_90() { return this.add("scale-y-90"); }
+get scaleY_95() { return this.add("scale-y-95"); }
+get scaleY_100() { return this.add("scale-y-100"); }
+get scaleY_105() { return this.add("scale-y-105"); }
+get scaleY_110() { return this.add("scale-y-110"); }
+get scaleY_125() { return this.add("scale-y-125"); }
+get scaleY_150() { return this.add("scale-y-150"); }
+get hoverScale_0() { return this.add("hover\:scale-0"); }
+get hoverScale_50() { return this.add("hover\:scale-50"); }
+get hoverScale_75() { return this.add("hover\:scale-75"); }
+get hoverScale_90() { return this.add("hover\:scale-90"); }
+get hoverScale_95() { return this.add("hover\:scale-95"); }
+get hoverScale_100() { return this.add("hover\:scale-100"); }
+get hoverScale_105() { return this.add("hover\:scale-105"); }
+get hoverScale_110() { return this.add("hover\:scale-110"); }
+get hoverScale_125() { return this.add("hover\:scale-125"); }
+get hoverScale_150() { return this.add("hover\:scale-150"); }
+get hoverScaleX_0() { return this.add("hover\:scale-x-0"); }
+get hoverScaleX_50() { return this.add("hover\:scale-x-50"); }
+get hoverScaleX_75() { return this.add("hover\:scale-x-75"); }
+get hoverScaleX_90() { return this.add("hover\:scale-x-90"); }
+get hoverScaleX_95() { return this.add("hover\:scale-x-95"); }
+get hoverScaleX_100() { return this.add("hover\:scale-x-100"); }
+get hoverScaleX_105() { return this.add("hover\:scale-x-105"); }
+get hoverScaleX_110() { return this.add("hover\:scale-x-110"); }
+get hoverScaleX_125() { return this.add("hover\:scale-x-125"); }
+get hoverScaleX_150() { return this.add("hover\:scale-x-150"); }
+get hoverScaleY_0() { return this.add("hover\:scale-y-0"); }
+get hoverScaleY_50() { return this.add("hover\:scale-y-50"); }
+get hoverScaleY_75() { return this.add("hover\:scale-y-75"); }
+get hoverScaleY_90() { return this.add("hover\:scale-y-90"); }
+get hoverScaleY_95() { return this.add("hover\:scale-y-95"); }
+get hoverScaleY_100() { return this.add("hover\:scale-y-100"); }
+get hoverScaleY_105() { return this.add("hover\:scale-y-105"); }
+get hoverScaleY_110() { return this.add("hover\:scale-y-110"); }
+get hoverScaleY_125() { return this.add("hover\:scale-y-125"); }
+get hoverScaleY_150() { return this.add("hover\:scale-y-150"); }
+get rotate_0() { return this.add("rotate-0"); }
+get rotate_45() { return this.add("rotate-45"); }
+get rotate_90() { return this.add("rotate-90"); }
+get rotate_180() { return this.add("rotate-180"); }
+get hoverRotate_0() { return this.add("hover\:rotate-0"); }
+get hoverRotate_45() { return this.add("hover\:rotate-45"); }
+get hoverRotate_90() { return this.add("hover\:rotate-90"); }
+get hoverRotate_180() { return this.add("hover\:rotate-180"); }
+get translateX_0() { return this.add("translate-x-0"); }
+get translateX_1() { return this.add("translate-x-1"); }
+get translateX_2() { return this.add("translate-x-2"); }
+get translateX_3() { return this.add("translate-x-3"); }
+get translateX_4() { return this.add("translate-x-4"); }
+get translateX_5() { return this.add("translate-x-5"); }
+get translateX_6() { return this.add("translate-x-6"); }
+get translateX_8() { return this.add("translate-x-8"); }
+get translateX_10() { return this.add("translate-x-10"); }
+get translateX_12() { return this.add("translate-x-12"); }
+get translateX_16() { return this.add("translate-x-16"); }
+get translateX_20() { return this.add("translate-x-20"); }
+get translateX_24() { return this.add("translate-x-24"); }
+get translateX_32() { return this.add("translate-x-32"); }
+get translateX_40() { return this.add("translate-x-40"); }
+get translateX_48() { return this.add("translate-x-48"); }
+get translateX_56() { return this.add("translate-x-56"); }
+get translateX_64() { return this.add("translate-x-64"); }
+get translateXPx() { return this.add("translate-x-px"); }
+get translateXFull() { return this.add("-translate-x-full"); }
+get translateX_1_2() { return this.add("-translate-x-1\/2"); }
+get translateY_0() { return this.add("translate-y-0"); }
+get translateY_1() { return this.add("translate-y-1"); }
+get translateY_2() { return this.add("translate-y-2"); }
+get translateY_3() { return this.add("translate-y-3"); }
+get translateY_4() { return this.add("translate-y-4"); }
+get translateY_5() { return this.add("translate-y-5"); }
+get translateY_6() { return this.add("translate-y-6"); }
+get translateY_8() { return this.add("translate-y-8"); }
+get translateY_10() { return this.add("translate-y-10"); }
+get translateY_12() { return this.add("translate-y-12"); }
+get translateY_16() { return this.add("translate-y-16"); }
+get translateY_20() { return this.add("translate-y-20"); }
+get translateY_24() { return this.add("translate-y-24"); }
+get translateY_32() { return this.add("translate-y-32"); }
+get translateY_40() { return this.add("translate-y-40"); }
+get translateY_48() { return this.add("translate-y-48"); }
+get translateY_56() { return this.add("translate-y-56"); }
+get translateY_64() { return this.add("translate-y-64"); }
+get translateYPx() { return this.add("translate-y-px"); }
+get translateYFull() { return this.add("-translate-y-full"); }
+get translateY_1_2() { return this.add("-translate-y-1\/2"); }
+get hoverTranslateX_0() { return this.add("hover\:translate-x-0"); }
+get hoverTranslateX_1() { return this.add("hover\:translate-x-1"); }
+get hoverTranslateX_2() { return this.add("hover\:translate-x-2"); }
+get hoverTranslateX_3() { return this.add("hover\:translate-x-3"); }
+get hoverTranslateX_4() { return this.add("hover\:translate-x-4"); }
+get hoverTranslateX_5() { return this.add("hover\:translate-x-5"); }
+get hoverTranslateX_6() { return this.add("hover\:translate-x-6"); }
+get hoverTranslateX_8() { return this.add("hover\:translate-x-8"); }
+get hoverTranslateX_10() { return this.add("hover\:translate-x-10"); }
+get hoverTranslateX_12() { return this.add("hover\:translate-x-12"); }
+get hoverTranslateX_16() { return this.add("hover\:translate-x-16"); }
+get hoverTranslateX_20() { return this.add("hover\:translate-x-20"); }
+get hoverTranslateX_24() { return this.add("hover\:translate-x-24"); }
+get hoverTranslateX_32() { return this.add("hover\:translate-x-32"); }
+get hoverTranslateX_40() { return this.add("hover\:translate-x-40"); }
+get hoverTranslateX_48() { return this.add("hover\:translate-x-48"); }
+get hoverTranslateX_56() { return this.add("hover\:translate-x-56"); }
+get hoverTranslateX_64() { return this.add("hover\:translate-x-64"); }
+get hoverTranslateXPx() { return this.add("hover\:translate-x-px"); }
+get hoverTranslateXFull() { return this.add("hover\:-translate-x-full"); }
+get hoverTranslateX_1_2() { return this.add("hover\:-translate-x-1\/2"); }
+get hoverTranslateY_0() { return this.add("hover\:translate-y-0"); }
+get hoverTranslateY_1() { return this.add("hover\:translate-y-1"); }
+get hoverTranslateY_2() { return this.add("hover\:translate-y-2"); }
+get hoverTranslateY_3() { return this.add("hover\:translate-y-3"); }
+get hoverTranslateY_4() { return this.add("hover\:translate-y-4"); }
+get hoverTranslateY_5() { return this.add("hover\:translate-y-5"); }
+get hoverTranslateY_6() { return this.add("hover\:translate-y-6"); }
+get hoverTranslateY_8() { return this.add("hover\:translate-y-8"); }
+get hoverTranslateY_10() { return this.add("hover\:translate-y-10"); }
+get hoverTranslateY_12() { return this.add("hover\:translate-y-12"); }
+get hoverTranslateY_16() { return this.add("hover\:translate-y-16"); }
+get hoverTranslateY_20() { return this.add("hover\:translate-y-20"); }
+get hoverTranslateY_24() { return this.add("hover\:translate-y-24"); }
+get hoverTranslateY_32() { return this.add("hover\:translate-y-32"); }
+get hoverTranslateY_40() { return this.add("hover\:translate-y-40"); }
+get hoverTranslateY_48() { return this.add("hover\:translate-y-48"); }
+get hoverTranslateY_56() { return this.add("hover\:translate-y-56"); }
+get hoverTranslateY_64() { return this.add("hover\:translate-y-64"); }
+get hoverTranslateYPx() { return this.add("hover\:translate-y-px"); }
+get hoverTranslateYFull() { return this.add("hover\:-translate-y-full"); }
+get hoverTranslateY_1_2() { return this.add("hover\:-translate-y-1\/2"); }
+get skewX_0() { return this.add("skew-x-0"); }
+get skewX_3() { return this.add("skew-x-3"); }
+get skewX_6() { return this.add("skew-x-6"); }
+get skewX_12() { return this.add("skew-x-12"); }
+get skewY_0() { return this.add("skew-y-0"); }
+get skewY_3() { return this.add("skew-y-3"); }
+get skewY_6() { return this.add("skew-y-6"); }
+get skewY_12() { return this.add("skew-y-12"); }
+get hoverSkewX_0() { return this.add("hover\:skew-x-0"); }
+get hoverSkewX_3() { return this.add("hover\:skew-x-3"); }
+get hoverSkewX_6() { return this.add("hover\:skew-x-6"); }
+get hoverSkewX_12() { return this.add("hover\:skew-x-12"); }
+get hoverSkewY_0() { return this.add("hover\:skew-y-0"); }
+get hoverSkewY_3() { return this.add("hover\:skew-y-3"); }
+get hoverSkewY_6() { return this.add("hover\:skew-y-6"); }
+get hoverSkewY_12() { return this.add("hover\:skew-y-12"); }
+get transitionNone() { return this.add("transition-none"); }
+get transitionAll() { return this.add("transition-all"); }
+get transition() { return this.add("transition"); }
+get transitionColors() { return this.add("transition-colors"); }
+get transitionOpacity() { return this.add("transition-opacity"); }
+get transitionShadow() { return this.add("transition-shadow"); }
+get transitionTransform() { return this.add("transition-transform"); }
+get easeLinear() { return this.add("ease-linear"); }
+get easeIn() { return this.add("ease-in"); }
+get easeOut() { return this.add("ease-out"); }
+get easeInOut() { return this.add("ease-in-out"); }
+get duration_75() { return this.add("duration-75"); }
+get duration_100() { return this.add("duration-100"); }
+get duration_150() { return this.add("duration-150"); }
+get duration_200() { return this.add("duration-200"); }
+get duration_300() { return this.add("duration-300"); }
+get duration_500() { return this.add("duration-500"); }
+get duration_700() { return this.add("duration-700"); }
+get duration_1000() { return this.add("duration-1000"); }
 get btn() { return this.add("btn"); }
 get btnBlue() { return this.add("btn-blue"); }
 

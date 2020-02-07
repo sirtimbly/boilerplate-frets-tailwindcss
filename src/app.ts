@@ -1,62 +1,41 @@
-import {IFunFrets, setup, PropsWithFields} from 'frets';
+import { IFunFrets, setup, PropsWithFields } from "frets/src";
+import { memoize } from "lodash-es";
 
-import {renderRoot} from './views/root';
+import { showList } from "./components/todolist";
+import loginComponent from "./components/login";
+import { $, $$ } from "~styles/app-styles";
 
 export class RealWorldProps extends PropsWithFields {
-	accountId: string = '';
-
-	loading: boolean;
-
-	logout: boolean;
-
-	error: string;
-
-	list: any;
-
-	showPlaceholder: boolean;
+  loggedIn: boolean = false;
+  loading: boolean;
+  list: any;
+  showPlaceholder: boolean;
 }
 
-export type ActionFn = (e: Event, data?: Readonly<RealWorldProps>) => Partial<RealWorldProps> | undefined;
+export type ActionFn = (
+  e: Event,
+  data?: Readonly<RealWorldProps>
+) => Partial<RealWorldProps> | undefined;
 
 export type App = IFunFrets<RealWorldProps>;
 
-setup(new RealWorldProps(), (F: App) => {
-	F.registerModel((proposal: Partial<RealWorldProps>, state) => {
-		if (proposal.accountId !== undefined) {
-			F.modelProps.error = '';
-			F.modelProps.loading = true;
-			setTimeout(() => {
-				F.modelProps.loading = false;
-				if (proposal.accountId === 'tim') {
-					F.modelProps.accountId = proposal.accountId;
-				} else {
-					F.modelProps.error = 'Invalid username or bad password.';
-				}
+setup(new RealWorldProps(), (f: App) => {
+  const login = loginComponent(f.present, f.projector);
 
-				state(F.modelProps);
-			}, 300);
-		}
+  f.registerAcceptor((proposal: Partial<RealWorldProps>, state) => {
+    if (proposal.list !== f.modelProps.list) {
+      f.modelProps.list = proposal.list;
+    }
+    state(f.modelProps);
+  });
 
-		if (proposal.loading === true || proposal.loading === false) {
-			F.modelProps.loading = proposal.loading;
-		}
-
-		if (proposal.showPlaceholder === true || proposal.showPlaceholder === false) {
-			F.modelProps.showPlaceholder = proposal.showPlaceholder;
-		}
-
-		if (proposal.list) {
-			F.modelProps.list = proposal.list;
-		}
-
-		if (proposal.logout === true) {
-			F.modelProps.accountId = '';
-		} else {
-			proposal.logout = false;
-		}
-
-		state(F.modelProps);
-	});
-
-	F.registerView(renderRoot);
-}).mountTo('app');
+  f.registerView(() => {
+    return $.div.h([
+      $$("h1").fontBold.text_2xl.textCenter.mxAuto.mt_3.h([
+        "A Simple Frets Sample App"
+      ]),
+      login.stateRenderer(),
+      f.modelProps.loggedIn && showList(f)
+    ]);
+  });
+}).mountTo("app");
