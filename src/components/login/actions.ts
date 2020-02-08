@@ -1,15 +1,15 @@
-import { LoginProps } from "./state";
+import { LoginProps } from "./models";
 import { RealWorldProps } from "~app";
-import { IRegisteredField } from "frets";
+import { IRegisteredField, IFunFrets } from "frets/src";
 
 export function willHandle(
-  f: import("/Users/tim/Sites/frets/build/main/Frets").IFunFrets<LoginProps>,
-  usernameField: IRegisteredField<string>,
-  passField: IRegisteredField<string>,
+  f: IFunFrets<LoginProps>,
   presentGlobal: (proposal: Partial<RealWorldProps>) => void
 ) {
   const loginAction = f.registerAction("login", (evt, present) => {
     evt.preventDefault();
+    const usernameField = f.registerField<string>("Username");
+    const passField = f.registerField<string>("Password");
     usernameField.validate();
     passField.validate();
     if (!usernameField.isValid() || !passField.isValid()) {

@@ -9,18 +9,6 @@ import { CenteredPanel } from "../CenteredPanel";
 import { PassiveText } from "../PassiveText";
 import { ErrorMsg } from "~components/error";
 
-enum States {
-  loggedIn = "loggedIn",
-  loading = "loading",
-  loggedOut = "loggedOut"
-}
-
-interface IViewStates {
-  loggedIn: VNode;
-  loading: VNode;
-  loggedOut: VNode;
-}
-
 export default function loginComponent(
   presentGlobal: (proposal: Partial<RealWorldProps>) => void,
   projector
@@ -32,34 +20,43 @@ export default function loginComponent(
     f => {
       console.log("setting up a new login component");
       willAccept(f);
-
-      f.registerView(({ modelProps }) => {
-        console.log("rendering login view", modelProps);
-        const { accountId, loading, error, logout } = modelProps;
-        const { usernameField, passField } = willMutate(f);
-        const { logoutAction, loginAction } = willHandle(
-          f,
-          usernameField,
-          passField,
-          presentGlobal
-        );
-        const possibleViewStates: IViewStates = {
-          loggedIn: LoggedIn({ accountId, logoutAction }),
-          loading: PassiveText.h([`Logging ${logout ? "Out" : "In"}...`]),
-          loggedOut: TextFieldForm({
-            textFields: [usernameField, passField],
+      willMutate(f);
+      const { logoutAction, loginAction } = willHandle(f, presentGlobal);
+      f.registerStateGraph({
+        name: "loggedOut",
+        edges: [
+          {
+            name: "loading",
+            guard: props => props.loading,
+            renderer: app =>
+              PassiveText.h([
+                `Logging ${app.modelProps.logout ? "Out" : "In"}...`
+              ])
+          },
+          {
+            name: "loggedIn",
+            guard: props => Boolean(props.accountId),
+            renderer: app =>
+              LoggedIn({ accountId: app.modelProps.accountId, logoutAction })
+          }
+        ],
+        renderer: app =>
+          TextFieldForm({
+            textFields: [
+              app.registerField("Username"),
+              app.registerField("Password")
+            ],
             loginAction,
-            loginLabel: "Engage"
+            loginLabel: "Log In"
           })
-        };
-        const currentViewState = !!accountId
-          ? States.loggedIn
-          : !!loading
-          ? States.loading
-          : States.loggedOut;
+      });
+
+      f.registerView(app => {
+        console.log("rendering login view", app.modelProps);
+        const { error } = app.modelProps;
         return CenteredPanel.h([
           ErrorMsg(error),
-          possibleViewStates[currentViewState]
+          app.currentStateNode.renderer(app)
         ]);
       });
     },

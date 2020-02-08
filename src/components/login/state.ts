@@ -1,4 +1,5 @@
 import { PropsWithFields, IFunFrets, IRegisteredField } from "frets/src/index";
+import { LoginProps } from "./models";
 
 
 

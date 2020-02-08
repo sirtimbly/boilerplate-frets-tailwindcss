@@ -1,4 +1,4 @@
-import { IRegisteredField } from "frets/src/Frets";
+import { IRegisteredField } from "frets/src";
 import { $, $$ } from "../styles/app-styles";
 import { VNode } from "frets";
 
@@ -12,12 +12,12 @@ export function textInput(field: IRegisteredField<string>): VNode {
           .when(field.validationErrors.length > 0)
           .border.borderRed_600.toObj(),
         value: field.value,
+        type: field.key.toLowerCase() === "password" ? "password" : "text",
         oninput: (e: Event) => {
           field.handler(
-            e
-            //,
-            // !field.isDirty() &&
-            //   (e.currentTarget as HTMLInputElement).value.length <= 0
+            e,
+            !field.isDirty() &&
+              (e.currentTarget as HTMLInputElement).value.length <= 0
           );
         },
         "aria-invalid": field.validationErrors.length > 0 ? "true" : "false"

@@ -14,7 +14,9 @@ export const TextFieldForm = (props: {
     $.button.mt_2.btn.btnBlue.h(
       {
         onclick: props.loginAction,
-        disabled: props.textFields.every(x => !x.isValid())
+        disabled: Boolean(
+          props.textFields.find(x => !x.value || !x.isDirty() || !x.isValid())
+        )
       },
       [props.loginLabel]
     )
