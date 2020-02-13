@@ -1,6 +1,6 @@
 import { LoginProps } from "./models";
 import { RealWorldProps } from "~app";
-import { IRegisteredField, IFunFrets } from "frets/src";
+import { IRegisteredField, IFunFrets } from "frets";
 
 export function willHandle(
   f: IFunFrets<LoginProps>,
@@ -16,20 +16,16 @@ export function willHandle(
       return;
     }
     present({
+      currentAction: "login",
       accountId: usernameField.value
     });
-    presentGlobal({
-      loggedIn: true
-    });
+
     passField.clear();
   });
   const logoutAction = f.registerAction("logout", (evt, present) => {
     evt.preventDefault();
     present({
-      logout: true
-    });
-    presentGlobal({
-      loggedIn: false
+      currentAction: "logout"
     });
   });
   return { logoutAction, loginAction };

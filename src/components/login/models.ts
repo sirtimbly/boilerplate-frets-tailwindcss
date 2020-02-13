@@ -1,4 +1,5 @@
-import { IFunFrets, PropsWithFields } from "frets/src";
+import { IFunFrets, PropsWithFields } from "frets";
+import { RealWorldProps } from "~app";
 export class LoginProps extends PropsWithFields {
   accountId: string = "";
 
@@ -11,11 +12,19 @@ export class LoginProps extends PropsWithFields {
   list: any;
 
   showPlaceholder: boolean;
+
+  currentAction: "" | "login" | "logout";
 }
-export const willAccept = (f: IFunFrets<LoginProps>) => {
+export const willAccept = (
+  f: IFunFrets<LoginProps>,
+  presentGlobal: (proposal: Partial<RealWorldProps>) => void
+) => {
   f.registerAcceptor((proposal: Partial<LoginProps>, state) => {
     console.log("accepting login proposal", proposal);
-    if (proposal.accountId !== f.modelProps.accountId) {
+    if (
+      proposal.currentAction === "login" &&
+      proposal.accountId !== f.modelProps.accountId
+    ) {
       setTimeout(() => {
         if (proposal.accountId && proposal.accountId !== "tim") {
           state({
@@ -24,7 +33,15 @@ export const willAccept = (f: IFunFrets<LoginProps>) => {
             accountId: ""
           });
         } else {
-          state({ loading: false, accountId: proposal.accountId });
+          console.log("logged in");
+          state({
+            currentAction: "",
+            loading: false,
+            accountId: proposal.accountId
+          });
+          presentGlobal({
+            loggedIn: true
+          });
         }
       }, 700);
       state({
@@ -35,12 +52,15 @@ export const willAccept = (f: IFunFrets<LoginProps>) => {
     }
   });
   f.registerAcceptor((proposal: Partial<LoginProps>, state) => {
-    console.log("accepting logout", proposal);
-    if (proposal.logout !== undefined) {
+    if (proposal.currentAction === "logout") {
+      console.log("accepting logout", proposal);
       setTimeout(() => {
-        state({ logout: false, loading: false });
+        state({ loading: false, accountId: "" });
+        presentGlobal({
+          loggedIn: false
+        });
       }, 500);
-      state({ logout: true, loading: true });
+      state({ loading: true });
     }
   });
   // f.registerAcceptor((proposal: Partial<LoginProps>, state) => {

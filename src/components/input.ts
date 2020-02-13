@@ -1,4 +1,4 @@
-import { IRegisteredField } from "frets/src";
+import { IRegisteredField } from "frets";
 import { $, $$ } from "../styles/app-styles";
 import { VNode } from "frets";
 

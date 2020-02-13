@@ -7,6 +7,7 @@
     "dev": "unite \"parcel serve src/index.html\" \"frets-styles-generator -w src/styles/\"",
     "build": "frets-styles-generator src/styles/app.css src/styles/app-styles.ts -p && parcel build src/index.html",
     "css": "postcss src/styles/app.css -c postcss.config.js -o dist/app.css",
+    "css:watch": "postcss src/styles/app.css -c postcss.config.js -o dist/app.css --watch",
     "lint": "xo",
     "lint:fix": "xo --fix",
     "test": "xo && jest"
@@ -49,7 +50,7 @@
   },
   "dependencies": {
     "@types/lodash-es": "^4.17.3",
-    "frets": "^1.0.0-beta.2",
+    "frets": "^1.0.1",
     "lodash-es": "^4.17.15"
   },
   "devDependencies": {
@@ -69,6 +70,8 @@
     "eslint-plugin-import": "^2.20.1",
     "frets-styles-generator": "^1.4.0",
     "parcel": "^1.12.4",
+    "postcss": "7.0.26",
+    "postcss-cli": "7.1.0",
     "prettier": "1.19.1",
     "purgecss-from-frets": "^1.0.3",
     "sass": "^1.20.1",

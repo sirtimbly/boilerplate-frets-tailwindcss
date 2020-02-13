@@ -1,9 +1,10 @@
-import { IFunFrets, setup, PropsWithFields } from "frets/src";
+import { IFunFrets, setup, PropsWithFields } from "frets";
 import { memoize } from "lodash-es";
 
-import { showList } from "./components/todolist";
+import { showList, stateGraph } from "./components/todolist";
 import loginComponent from "./components/login";
 import { $, $$ } from "~styles/app-styles";
+import { successBox } from "~components/CenteredPanel";
 
 export class RealWorldProps extends PropsWithFields {
   loggedIn: boolean = false;
@@ -20,22 +21,20 @@ export type ActionFn = (
 export type App = IFunFrets<RealWorldProps>;
 
 setup(new RealWorldProps(), (f: App) => {
-  const login = loginComponent(f.present, f.projector);
-
   f.registerAcceptor((proposal: Partial<RealWorldProps>, state) => {
-    if (proposal.list !== f.modelProps.list) {
-      f.modelProps.list = proposal.list;
-    }
-    state(f.modelProps);
+    console.log("accepting global proposal", proposal);
+    state({ ...proposal });
   });
-
+  const login = loginComponent(f.present, f.projector);
+  f.registerStateGraph(stateGraph);
   f.registerView(() => {
     return $.div.h([
       $$("h1").fontBold.text_2xl.textCenter.mxAuto.mt_3.h([
         "A Simple Frets Sample App"
       ]),
       login.stateRenderer(),
-      f.modelProps.loggedIn && showList(f)
+      f.modelProps.loggedIn && showList(f),
+      successBox(["props: ", JSON.stringify(f.modelProps)]) //+
     ]);
   });
 }).mountTo("app");
